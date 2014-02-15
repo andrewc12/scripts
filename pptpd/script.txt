@@ -14,7 +14,7 @@ ms-dns 8.8.4.4
 #ms-dns 172.16.0.23
 
 nano /etc/ppp/chap-secrets
-andrew pptpd tUHuESYBJ8iUGWYxYsSj *
+andrew pptpd $password *
 
 nano /etc/sysctl.conf
 net.ipv4.ip_forward=1
