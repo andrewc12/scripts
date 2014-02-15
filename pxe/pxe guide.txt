@@ -1,0 +1,95 @@
+So you want net boot things
+
+Three parts
+
+In this part we set up the services to lease IP addresses, tell them what file to download, and serve them the file
+apt-get install isc-dhcp-server tftp-hpa
+
+
+nano /etc/dhcp/dhcpd.conf
+
+
+default-lease-time 600;
+max-lease-time 7200;
+allow booting;
+# serve ips 10.0.0.3 to 200
+subnet 10.0.0.0 netmask 255.255.255.0 {
+  range 10.0.0.3 10.0.0.200;
+  option broadcast-address 10.0.0.255;
+  option routers 10.0.0.253;             
+  option domain-name-servers 10.0.0.253; 
+  next-server 10.0.0.27;                
+}
+# for chain loading gpxe from the default PXE client
+# then when gpxe asks it gets the actual filename
+if exists user-class and option user-class = "gPXE" {
+  filename "pxelinux.0"; # (this we will provide later)
+} else {
+  filename "gpxelinux.0"; # (this we will provide later)
+}
+
+
+/etc/init.d/isc-dhcp-server restart
+
+In this section we set up a menu to load and boot files from the network
+
+
+Files to boot
+
+mkdir /srv/tftp/images
+mkdir /srv/tftp/pxelinux.cfg
+
+Copy syslinux files
+apt-get install syslinux
+
+cp /usr/lib/syslinux/gpxelinux.0 /srv/tftp/
+cp /usr/lib/syslinux/menu.c32 /srv/tftp/
+cp /usr/lib/syslinux/vesamenu.c32 /srv/tftp/
+cp /usr/lib/syslinux/reboot.c32 /srv/tftp/
+cp /usr/lib/syslinux/chain.c32 /srv/tftp/
+cp /usr/lib/syslinux/memdisk /srv/tftp/
+
+
+#download the Clonezilla live zip
+unzip -o clonezilla-live-*-i686-pae.zip -d /srv/tftp/images/clonezilla
+
+#the following was made after looking at images/clonezilla/syslinux/syslinux.cfg
+nano /srv/tftp/pxelinux.cfg/default
+
+ui menu.c32
+menu title Utilities
+
+label clonezilla
+  menu label Clonezilla
+  kernel images/clonezilla/live/vmlinuz
+  append boot=live username=user config  noswap edd=on nomodeset noprompt locales= keyboard-layouts= ocs_live_run="ocs-live-general" ocs_live_extra_param="" ocs_live_batch=no vga=788 nosplash fetch=tftp://10.0.0.27/images/clonezilla/live/filesystem.squashfs i915.blacklist=yes radeonhd.blacklist=yes nouveau.blacklist=yes vmwgfx.enable_fbdev=no
+  initrd images/clonezilla/live/initrd.img
+
+
+
+/etc/init.d/tftpd-hpa restart
+
+label sysrcd
+  menu label system rescue cd
+  kernel images/systemrescuecd-x86-3.8.1/isolinux/rescue32   
+  append netboot=http://10.0.0.27/images/systemrescuecd-x86-3.8.1/sysrcd.dat
+  initrd images/systemrescuecd-x86-3.8.1/isolinux/initram.igz
+  
+altker32  chain.c32     f3params.msg  f6pxe.msg    isolinux.old  memdisk   pxelinux.0  rescue64
+altker64  f1boot.msg    f4arun.msg    f7net.msg    isolinux.bin  kbdmap.c32    menu.c32  reboot.c32  vesamenu.c32
+boot.cat  f2images.msg  f5troubl.msg  ifcpu64.c32  isolinux.cfg  maps          netboot   
+root@tftp:/srv/tftp/images/systemrescuecd-x86-3.8.1# s/systemrescuecd-x86-3.8.1# ls
+
+
+
+
+
+
+
+
+Firmware upgrade disk
+
+Optional advanced file access
+Apache, NFS
+
+

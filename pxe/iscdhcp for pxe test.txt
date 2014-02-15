@@ -1,0 +1,199 @@
+nano /etc/dhcp/dhcpd.conf
+
+
+default-lease-time 600;
+max-lease-time 7200;
+allow booting;
+next-server 10.0.0.27;                
+# for chain loading gpxe from the default PXE client
+# then when gpxe asks it gets the actual filename
+if exists user-class and option user-class = "gPXE" {
+  filename "pxelinux.0"; # (this we will provide later)
+} else {
+  if substring(option vendor-class-identifier, 0, 9) = "PXEClient" ()
+    filename "gpxelinux.0"; # (this we will provide later)
+  )
+}
+
+
+
+
+
+# for chain loading gpxe from the default PXE client
+# then when gpxe asks it gets the actual filename
+if substring(option vendor-class-identifier, 0, 9) = "PXEClient" (
+  if exists user-class and option user-class = "gPXE" {
+    filename "pxelinux.0"; 
+  } else {
+    filename "gpxelinux.0"; 
+  )
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ddns-update-style none;
+option domain-name "mycroes.nl";
+option domain-name-servers 192.168.5.1;
+
+default-lease-time 600;
+max-lease-time 7200;
+log-facility local7;
+
+class "pxeclients" {
+ match if substring(option vendor-class-identifier, 0, 9) = "PXEClient";
+ filename "pxelinux.0";
+}
+
+shared-network 5 {
+ subnet 192.168.5.0 netmask 255.255.255.0 {
+ }
+ pool {
+  allow members of "pxeclients";
+  range dynamic-bootp 192.168.5.201 192.168.5.240;
+ }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+The boot-unknown-clients statement boot-unknown-clients flag; 
+If the boot-unknown-clients statement is present and has a value of false or off, then clients for which there is no host declaration will not be allowed to obtain IP addresses. If this statement is not present or has a value of true or on, then clients without host declarations will be allowed to obtain IP addresses, as long as those addresses are not restricted by allow and deny statements within their pool declarations. 
+
+
+
+
+
+REFERENCE: ALLOW AND DENY
+
+The allow and deny statements can be used to control the response of the DHCP server to various sorts of requests. The allow and deny keywords actually have different meanings depending on the context. In a pool context, these keywords can be used to set up access lists for address allocation pools. In other contexts, the keywords simply control general server behavior with respect to clients based on scope. In a non-pool context, the ignore keyword can be used in place of the deny keyword to prevent logging of denied requests. 
+
+Allow Deny And Ignore In Scope
+
+The following usages of allow and deny will work in any scope, although it is not recommended that they be used in pool declarations. 
+
+The unknown-clients keyword 
+
+allow unknown-clients; deny unknown-clients; ignore unknown-clients; 
+
+The unknown-clients flag is used to tell dhcpd whether or not to dynamically assign addresses to unknown clients. Dynamic address assignment to unknown clients is allowed by default. An unknown client is simply a client that has no host declaration. 
+
+The use of this option is now deprecated. If you are trying to restrict access on your network to known clients, you should use deny unknown-clients; inside of your address pool, as described under the heading ALLOW AND DENY WITHIN POOL DECLARATIONS. 
+
+
+
+
+
+
+scope. By default, or if flag is false, no lookups are done. 
+The hardware statement hardware hardware-type hardware-address; 
+In order for a BOOTP client to be recognized, its network hardware address must be declared using a hardware clause in the host statement. hardware-type must be the name of a physical hardware interface type. Currently, only the ethernet and token-ring types are recognized, although support for a fddi hardware type (and others) would also be desirable. The hardware-address should be a set of hexadecimal octets (numbers from 0 through ff) separated by colons. The hardware statement may also be used for DHCP clients. 
+The host-identifier option statement host-identifier option option-name option-data; 
+This identifies a DHCPv6 client in a host statement. option-name is any option, and option-data is the value for the option that the client will send. The option-data must be a constant value. 
+
+
+
+
+
+
+renews its lease, which could have a significant performance impact in environments that place heavy demands on the DHCP server. 
+The use-host-decl-names statement use-host-decl-names flag; 
+If the use-host-decl-names parameter is true in a given scope, then for every host declaration within that scope, the name provided for the host declaration will be supplied to the client as its hostname. So, for example, 
+    group {
+      use-host-decl-names on;
+
+     host joe {
+        hardware ethernet 08:00:2b:4c:29:32;
+        fixed-address joe.fugue.com;
+      }
+    }
+
+is equivalent to
+
+     host joe {
+        hardware ethernet 08:00:2b:4c:29:32;
+        fixed-address joe.fugue.com;
+        option host-name "joe";
+      }
+An option host-name statement within a host declaration will override the use of the name in the host declaration. 
+It should be noted here that most DHCP clients completely ignore the host-name option sent by the DHCP server, and there is no way to configure them not to do this. So you generally have a choice of either not having any hostname to client IP address mapping that the client will recognize, or doing DNS updates. It is beyond the scope of this document to describe how to make this determination. 
+The use-lease-addr-for-default-route statement use-lease-addr-for-default-route flag; 
+If the use-lease-addr-for-default-route parameter is true in a given scope, then instead of sending the value specified in the routers option (or sending no value at all), the IP address of the lease being assigned is sent to the client. This supposedly causes Win95 machines to ARP for all IP addresses, which can be helpful if your router is configured for proxy ARP
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+I setup a dhcp server on a debian.
+It is designed to only assign ip addresses to a list of known hosts.
+The config file looks like :
+
+Code:
+
+log-facility local6;
+ignore unknown-clients;
+host 1 { hardware ethernet 00:03:2d:xx:xx:xx; fixed-address 172.16.101.151; }
+host 2 { hardware ethernet 00:03:2d:yy:yy:yy; fixed-address 172.16.102.151; }
+host 3 { hardware ethernet 00:03:2d:zz:zz:zz; fixed-address  172.16.103.151; }

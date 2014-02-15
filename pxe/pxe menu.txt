@@ -1,0 +1,131 @@
+#plop
+#Install or run
+MENU BEGIN [tagname]
+    label clonezilla
+        menu label Plop
+        kernel Location goes here
+    label clonezilla
+        menu label Plop install 
+        kernel Location goes here
+    label clonezilla
+        MENU EXIT [tagname]
+MENU END
+    
+    
+    
+    
+    
+    
+    
+    
+MENU BEGIN [tagname]
+MENU END
+
+        Begin/end a submenu. The entries between MENU BEGIN and MENU END form a submenu, which is marked with a > mark on the right hand of the screen. Submenus inherit the properties of their parent menus, but can override them, and can thus have their own backgrounds, master passwords, titles, timeouts, messages and so forth. 
+
+
+MENU GOTO tagname
+
+        (Only valid after a LABEL statement.) 
+        This label will transfer to the named submenu instead of booting anything. To transfer to the top-level menu, specify "menu goto .top". 
+
+
+MENU EXIT [tagname]
+
+        (Only valid after a label statement inside MENU BEGIN ... MENU END) 
+        Exit to the next higher menu, or, if tagname is specified, to the named menu. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#The modified lines
+
+MENU BEGIN Rescue tools
+MENU LABEL Rescue tools
+MENU TITLE FOG Computer Cloning Solution
+
+LABEL Back
+MENU EXIT
+MENU LABEL Back
+
+LABEL Hirens
+kernel fog/hirens/memdisk
+append iso initrd=fog/dell/MyHirensBootCD.iso raw
+MENU LABEL Hiren's Boot CD
+TEXT HELP
+Run Hiren's Boot CD
+ENDTEXT
+
+LABEL Dell Diagnostics
+kernel fog/dell/memdisk
+append iso initrd=fog/dell/delldiags.iso raw
+MENU LABEL Dell Diagnostics
+TEXT HELP
+Dell(TM) Diagnostic software
+ENDTEXT
+
+MENU END
+
+
+
+
+
+
+
+
+
+
+
+
+
+##########plop
+
+MENU BEGIN Plop
+MENU LABEL Plop
+MENU TITLE Plop boot loader
+
+LABEL Back
+MENU EXIT
+MENU LABEL Back
+
+LABEL Plop Live 
+kernel images/plop/plpbt.bin
+#append iso initrd=fog/dell/MyHirensBootCD.iso raw
+MENU LABEL Plop
+TEXT HELP
+Run Plop
+ENDTEXT
+
+LABEL Plop Install
+kernel images/plop/install/plpinstc.com 
+#append iso initrd=fog/dell/delldiags.iso raw
+MENU LABEL Install Plop
+TEXT HELP
+Run Plop Install
+ENDTEXT
+
+MENU END
+
+
+
+
+
+
+
+
+
+
+
