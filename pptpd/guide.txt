@@ -1,0 +1,278 @@
+
+Pizza And Code
+RSSTwitterLinkedIn
+
+    Home
+    Photostream
+    About
+
+#Samsung #Galaxy S III Review: This Is The Phone You’ve Been Waiting For #android #iphone Automated weather alerts coming soon to smartphone near you – Times Union
+Personal VPN How-To: PPTP
+By amrith On July 1, 2012 · 2 Comments
+2
+
+I’ve been annoyed by the fact that public internet providers are slipstreaming content, and also that accessing public internet access points is a potential security risk. I refer, for example to this earlier post on my blog. For some time now I have been muttering about a personal VPN and some months ago I setup one for myself. It has worked well and over the past several months I have occasionally tweaked it a bit to make it more useful. Others may have a similar interest so here is a simple how-to that will give you an inexpensive personal VPN.
+Basics
+
+There is a wealth of information about VPN’s and PPTP on the web. I refer you to the Wikipedia articles in particular, this one on the subject of VPN’s and this one on the subject of PPTP. A good article about another kind of VPN called OpenVPN is found here. For my purposes, I have found PPTP to be satisfactory and have resisted the urge to upgrade to OpenVPN.
+Platform choice
+
+I implemented my VPN solution two ways. The first was using my home Ubuntu machine as the VPN server. The second was using an instance in the Amazon EC2 cloud. I will describe below the mechanism for implementing a VPN in the EC2 cloud and provide a small addendum on how you could do this with a server at home.
+Cost
+
+Price per hour of t1.micro (click on picture for larger image)
+
+If you run the VPN the way I suggest, on a micro instance in Amazon’s EC2 cloud, the cost is very low. I run my instances as spot priced instances and invariably a t1.micro at spot price is less than a penny an hour.
+
+Here is the price graph for some months, I’ve carefully cut the data for the last couple of days off because the power outages in the Amazon us-east AZ caused the price to jump to a dollar and that makes the graph less attractive ;) Seriously, that is an aberration, my VPN server is setup with a price cap of $0.02 per hour and it died when then price shot up. I restarted it manually at the standard price when that happened.
+
+In addition, depending on how much data you send over the VPN, you will also be assessed a charge for data transfer. I have found that to be minimal. Since I run my VPN on my personal Amazon account (we also use EC2 for work), I get the benefit of the Free tier for the first year and the VPN hasn’t exceeded the free tier usage at any time.
+
+Of course, if you run the VPN on a server in your house, you don’t have to worry about these costs; all you have to ensure is that you can reach the VPN server from any place. More about that later.
+The How-To
+
+Step 1: Launch EC2 instance to customize VPN AMI
+
+I launched an EC2 instance based on the stock 12.04 LTS AMI provided by Amazon. A t1.micro instance is more than sufficient for this purpose. If you are using some other cloud provider or are planning to do this on a machine at home, get yourself access to a machine that has some recent flavor of Ubuntu or Linux and to which you have root access.
+
+If you are doing this in Amazon, you must first setup the security group for this instance, before you launch the instance. Skip forward to step 6 in this how-to and setup a security group as described there and launch your EC2 instance using that security group.
+
+Step 2: Install and configure the VPN Software
+
+sudo apt-get update
+
+sudo apt-get install pptpd
+
+The configuration itself is quite straightforward.
+
+First you need to identify the range of IP addresses that will be used by your VPN. This includes the IP address that your VPN Gateway will use, and the IP addresses for the hosts that connect to the VPN Gateway. For a variety of reasons, I chose to set my VPN Gateway at 10.40.1.1 and the IP Addresses it gave out at 10.40.1.20-10.40.1.50. This setting is in/etc/pptpd.conf, edit using your favorite text editor, remember you must be root to do this.
+
+localip 10.40.1.1
+remoteip 10.40.1.20-50
+
+Your PPTP Server will hand out IP Addresses and DNS settings to clients. It is a good idea to set DNS Server settings in the PPTP Server so that clients can do name resolution. This is done in /etc/ppp/pptpd-options, edit using your favorite text editor, remember you must be root to do this.
+
+ms-dns 8.8.8.8
+ms-dns 8.8.4.4
+ms-dns 172.16.0.23
+
+I chose to specify above that the PPTP Server should hand out the addresses of the Google public DNS Servers and the Amazon public DNS Server. You can use any servers you want.
+
+Finally, configure the PPTP Server with login credentials. You can setup as many users as you want on the PPTP Server, I chose to setup three. For simplicity, let me call them user01, user02 and user03. I use a random password generation script to make up the passwords, something similar to the one described here.
+
+User name and password are stored in the file /etc/ppp/chap-secrets. Edit it with a text editor and add lines line these into it, one per user that you wish to setup.
+
+USERNAME pptpd PASSWORD *
+
+So, I added the following three lines:
+
+user01 pptpd osvCylQX *
+user02 pptpd TIRUssa3 *
+user03 pptpd nJ6ljIBf *
+
+Using this handy little script
+
+#!/bin/bash
+
+echo "user01 pptpd osvCylQX *" | sudo tee -a /etc/ppp/chap-secrets
+echo "user02 pptpd TIRUssa3 *" | sudo tee -a /etc/ppp/chap-secrets
+echo "user03 pptpd nJ6ljIBf *" | sudo tee -a /etc/ppp/chap-secrets
+
+At this point, your PPTP Server is mostly ready to go. Just a couple of more things to take care of.
+
+Step 3: Enable IP Forwarding and NAT
+
+IP Forwarding is not enabled by default on Ubuntu. You can do that by editing /etc/sysctl.conf and then updating the system. Uncomment this line in /etc/sysctl.conf:
+
+net.ipv4.ip_forward=1
+
+and update system configuration
+
+sudo sysctl -p
+
+Update /etc/rc.local and add the following two lines to make NAT work properly. Update the interface name to suit; I used eth0, you may have to use something else.
+
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+iptables -I FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+
+Step 4: Making your server accessible remotely.
+
+If you are using a server in the cloud, or if you are using a home machine, there is a chance that it’s public IP address will change from time to time. For example, your server in EC2 may be restarted, your home ISP may reassign your IP Address etc., I use a Dynamic DNS system to make my servers always accessible. Personally, I have had good luck with the DDNS service provided by Dyn. Even if you choose to use their free trial to begin with, if you use your VPN at all, you will have no problem spending the $20 per year for this very good service.
+
+sudo aptitude install ddclient
+
+Most of the configuration you need will be done during the installation but just to be sure, go and look at the file /etc/ddclient.conf.
+
+You can use the handy-dandy configurator at Dyn to get the right incantations.
+
+My /etc/ddclient.conf file has the following in it.
+
+## ddclient configuration file
+daemon=3600
+# check every 3600 seconds
+syslog=yes
+# log update msgs to syslog
+mail-failure=<my email address> # Mail failed updates to user
+pid=/var/run/ddclient.pid
+# record PID in file.
+## Detect IP with our CheckIP server
+use=web, web=checkip.dyndns.com/, web-skip='IP Address'
+## DynDNS username and password here
+login=<dyn user name>
+password='<dyn password>'
+## Default options
+protocol=dyndns2
+server=members.dyndns.org
+## Dynamic DNS hosts
+<HOST NAME>
+
+Step 5: Restart the PPTP server
+
+This is the final step to get the things all up and running.
+
+sudo service pptpd restart
+
+And you should be up and running!
+
+Step 6:Setting up your firewall for remote access.
+
+Irrespective of whether you are using an Amazon EC2 instance of a machine in your own house, you will likely need to tweak your firewall to make things work correctly. Amazon calls the firewall a security group, configure it to allow incoming connections on TCP Ports 1723 (and 22 for SSH). I also open ICMP so I can ping it to make sure it is responsive. On Amazon I also tend to leave all ports open for loopback.
+
+ICMP ALL 0.0.0.0/0
+TCP 22 (SSH) 0.0.0.0/0
+TCP 0-65535 (this security group)
+TCP 1723 (PPTP) 0.0.0.0/0
+UDP 0-65536 (this security group)
+
+Note regarding in-home setup: You can ignore the last two for your in-home configuration. Depending on the router of network access device you have, you may have to setup port forwarding rules. See the documentation for your router/access point for details.
+Testing
+
+First, attempt to ping your server from a client machine. Shown here from my Windows PC.
+
+C:\Users\amrith>ping hostname.dyndns.org
+
+Pinging hostname.dyndns.org [107.22.65.185] with 32 bytes of data:
+Reply from 107.22.65.185: bytes=32 time=23ms TTL=46
+Reply from 107.22.65.185: bytes=32 time=23ms TTL=46
+
+Ping statistics for 107.22.65.185:
+    Packets: Sent = 2, Received = 2, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 23ms, Maximum = 23ms, Average = 23ms
+Control-C
+^C
+C:\Users\amrith>
+
+As you can see, my Dynamic DNS entry has worked and the name resolution is working correctly.
+
+Then attempt to connect to the VPN. On Windows and Android this is relatively straightforward.I had a little trouble with Ubuntu. My Ubuntu machine is running 10.04 LTS, note that machines running versions of Ubuntu prior to 10.04 require additional configuration before you can make PPTP work properly.
+
+Note for Ubuntu Users:
+
+You may find that your VPN works properly from Windows and Android (for example) but it doesn’t work on Ubuntu. This is what happened for me.
+
+You need to perform one additional configuration step on Ubuntu clients and that is to add a line into the chap-secrets file.
+
+Here is what I have in my /etc/ppp/chap-secrets file on one of my Ubuntu client machines.
+
+# Secrets for authentication using CHAP
+# client        server  secret                  IP addresses
+user01 pptpd osvCylQX *
+
+It is basically the same line as you used in step 2 above.
+
+With this line, connection from Ubuntu was effortless.
+Finalizing your configuration
+
+The setup above will come up automatically when the machine is restarted, it will automatically register with Dynamic DNS and should work well for you. For users of Amazon EC2, one final step remains.
+
+Step 7: Make an image of your VPN Server
+
+Use either the GUI or the ec2- CLI and make yourself an AMI. Then you can setup a script that will launch a persistent spot request for a t1.micro server using that AMI.
+
+Once you make an AMI, shutdown the VPN server you created above and launch your AMI, I use this script.
+
+#!/bin/bash
+
+ec2-request-spot-instances -t t1.micro ami-<id goes here> --price 0.02 --instance-count 1 -r persistent -k my-ec2-keypair -g vpn-security-group
+
+As you can see, I launch a t1.micro instance and am willing to pay no more than 0.02 (2 cents) per hour and I want this request to be persistent. It has worked well for me.
+Common problems
+
+1. Some sites don’t work, others do.
+
+I used to have this problem and tracked it down to an issue with packet sizing. You should not have this problem if you correctly followed step 3 above. The two commands for iptables (the second in particular) was something I added to fix this problem.
+
+2. Problems connecting from Ubuntu.
+
+I used to have this problem and the “Note for Ubuntu Users” in the Testing section was the response. If you are using Ubuntu prior to 10.04, you will need to follow the additional instructions here. It would be much easier if you upgraded ;)
+
+3. After rebooting my VPN, I cannot access it OR
+
+4. From time to time I am unable to access my VPN.
+
+The first thing to do is to make sure that you are able to ping your VPN server. If you configured your firewall the way I proposed above, you should be able to do this. Use the same name that you are providing to your VPN connection. If you are unable to ping the server, you know to start looking outside your VPN server, if you are able to ping your VPN server, attempt to SSH to it and make sure you are able to connect to it. This latter step is important because you want to make sure that you are in-fact pingingyour VPN server, not one that happens to be responding to the name you provided.
+
+If you are able to SSH to the VPN server but not connect to it using a VPN client, it is time to start looking at the log files from the VPN server (/var/log/syslog) and troubleshooting your configuration.
+
+I’ve generally found that if the initial AMI you setup works well, it is easiest to just restart the VPN server and go from there.
+2
+Tagged with: Amazon EC2 • IPSEC • personal VPN • PPTP • VPN 
+Share ?
+inShare
+2 Responses to Personal VPN How-To: PPTP
+
+    six strikes vpn says:	
+    July 15, 2013 at 9:58 pm	
+
+    While a standard VPN will use 128 bit encryption, 256 is becoming more popular,
+    and will be the standard encryption in the near
+    future. Aside from being very easy to use it has all the
+    great features that you will ever need in taking pictures.
+    Web based proxies offer some advantages like zero installation, one license
+    for multiple devices, and the ability to use them on mobile devices in China (i –
+    Phone and Android).
+    Reply	
+    Rafael says:	
+    January 18, 2014 at 9:23 pm	
+
+    Thank you very much!!!!!
+
+    I almost dismissed this! I doubted that the extra iptables -I FORWARD on step 3 would fix my problem but glancing the common problem number 1 I decided to try it and it saved my life!!! Never would have figure it out on my on (I not a infrastructure guy)!
+
+    Thanks again!
+    Reply	
+
+Leave a Reply
+
+Your email address will not be published. Required fields are marked *
+
+Name *
+
+Email *
+
+Website
+
+Comment
+
+You may use these HTML tags and attributes: <a href="" title=""> <abbr title=""> <acronym title=""> <b> <blockquote cite=""> <cite> <code> <del datetime=""> <em> <i> <q cite=""> <strike> <strong>
+
+    Recent Posts
+        Beware of GoDaddy Auctions!
+        Article: The 40 Must-Have Android Apps for the Power User – The Next Web
+        Say no to pay-to-pitch schemes!
+        How to lose $172,222 a second for 45 minutes
+        Article: Microsoft Yanks Windows RT 8.1 Update
+        Article: How IBM is making computers more like your brain. For real
+        Article: Fossil Find Points To A Streamlined Human Lineage
+        Article: If Landlines Disappear, What Happens in a Blackout?
+        Is this the end of NoSQL?
+        Ingesting data at over 1,000,000 rows/second with MySQL in Amazon’s cloud!
+        Article: Are cloud platforms saying goodbye to the hypervisor?
+        Article: The Best Pizza In 10 Big Cities Around The US
+        AWS REST API in C
+        Samsung Galaxy Note 8? now $299 at Staples
+        New Article: 8 Things Not to Miss in Istanbul
+
+© 2011 Pizza And Code. All rights reserved.
+;)
