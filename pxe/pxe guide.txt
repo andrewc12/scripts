@@ -1,47 +1,72 @@
-So you want net boot things
+#rev3
+# Only assign addresses to known hosts
 
-Three parts
-
-In this part we set up the services to lease IP addresses, tell them what file to download, and serve them the file
-apt-get install isc-dhcp-server tftp-hpa
+#rev2
+#Cleaned up The guide Adjusted it so that you should be able to copy and paste to a terminal 
 
 
-nano /etc/dhcp/dhcpd.conf
 
+
+
+
+
+
+#So you want net boot things
+
+#In this part we set up the services to lease IP addresses, tell them what file to download, and serve them the file
+apt-get install isc-dhcp-server tftpd-hpa
+
+
+#nano /etc/dhcp/dhcpd.conf
+cat > /etc/dhcp/dhcpd.conf << "EOF"
 
 default-lease-time 600;
 max-lease-time 7200;
 allow booting;
-# serve ips 10.0.0.3 to 200
+ignore unknown-clients;
+# serve ips 10.0.0.180 to 200
 subnet 10.0.0.0 netmask 255.255.255.0 {
-  range 10.0.0.3 10.0.0.200;
-  option broadcast-address 10.0.0.255;
-  option routers 10.0.0.253;             
-  option domain-name-servers 10.0.0.253; 
-  next-server 10.0.0.27;                
+    range 10.0.0.180 10.0.0.200;
+    option broadcast-address 10.0.0.255;
+    option routers 10.0.0.138;             
+    option domain-name-servers 10.0.0.138; 
+    next-server 10.0.0.26;                
 }
+
+host 1 { hardware ethernet 08:00:27:F4:1E:9C; }
 # for chain loading gpxe from the default PXE client
 # then when gpxe asks it gets the actual filename
 if exists user-class and option user-class = "gPXE" {
-  filename "pxelinux.0"; # (this we will provide later)
+    filename "pxelinux.0"; # (this we will provide later)
 } else {
-  filename "gpxelinux.0"; # (this we will provide later)
+    if substring(option vendor-class-identifier, 0, 9) = "PXEClient" {
+        filename "gpxelinux.0"; # (this we will provide later)
+    }
 }
-
+EOF
 
 /etc/init.d/isc-dhcp-server restart
 
-In this section we set up a menu to load and boot files from the network
 
 
-Files to boot
 
+
+
+#In this section we set up a menu to load and boot files from the network
+
+
+#Files to boot
+
+mkdir /srv/tftp/
 mkdir /srv/tftp/images
 mkdir /srv/tftp/pxelinux.cfg
 
-Copy syslinux files
+#Copy syslinux files
 apt-get install syslinux
 
+
+
+cp /usr/lib/syslinux/pxelinux.0 /srv/tftp/
 cp /usr/lib/syslinux/gpxelinux.0 /srv/tftp/
 cp /usr/lib/syslinux/menu.c32 /srv/tftp/
 cp /usr/lib/syslinux/vesamenu.c32 /srv/tftp/
@@ -50,19 +75,45 @@ cp /usr/lib/syslinux/chain.c32 /srv/tftp/
 cp /usr/lib/syslinux/memdisk /srv/tftp/
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+########## WARNING #########
+#this Is where I start to stop caring
+#This should end up lower in the document when a fix things up
+
+
+
 #download the Clonezilla live zip
 unzip -o clonezilla-live-*-i686-pae.zip -d /srv/tftp/images/clonezilla
 
 #the following was made after looking at images/clonezilla/syslinux/syslinux.cfg
 nano /srv/tftp/pxelinux.cfg/default
 
+
 ui menu.c32
 menu title Utilities
 
 label clonezilla
-  menu label Clonezilla
+menu label Clonezilla
   kernel images/clonezilla/live/vmlinuz
-  append boot=live username=user config  noswap edd=on nomodeset noprompt locales= keyboard-layouts= ocs_live_run="ocs-live-general" ocs_live_extra_param="" ocs_live_batch=no vga=788 nosplash fetch=tftp://10.0.0.27/images/clonezilla/live/filesystem.squashfs i915.blacklist=yes radeonhd.blacklist=yes nouveau.blacklist=yes vmwgfx.enable_fbdev=no
+  append boot=live username=user config  noswap edd=on nomodeset noprompt locales= keyboard-layouts= ocs_live_run="ocs-live-general" ocs_live_extra_param="" ocs_live_batch=no vga=788 nosplash fetch=tftp://10.0.0.10/images/clonezilla/live/filesystem.squashfs i915.blacklist=yes radeonhd.blacklist=yes nouveau.blacklist=yes vmwgfx.enable_fbdev=no
   initrd images/clonezilla/live/initrd.img
 
 
@@ -93,3 +144,21 @@ Optional advanced file access
 Apache, NFS
 
 
+
+
+ apt-get install  nfs-kernel-server
+nano  /etc/exports
+/srv/tftp/images *(ro,async,no_wdelay,insecure_locks,no_root_squash,insecure,no_subtree_check)
+service nfs-kernel-server restart
+
+
+mount -o loop ubuntu.iso /mnt
+mkdir -p /srv/tftp/images/ubuntulive/i386/13.10
+cp -r /mnt/* /srv/tftp/images/ubuntulive/i386/13.10/
+
+LABEL ubli1310i386
+MENU LABEL Ubuntu Live 13.10 i386
+KERNEL images/ubuntulive/i386/13.10/casper/vmlinuz
+INITRD images/ubuntulive/i386/13.10/casper/initrd.lz
+APPEND root=/dev/nfs boot=casper netboot=nfs nfsroot=10.0.0.10:/srv/tftp/images/ubuntulive/i386/13.10 ip=dhcp rw only-ubiquity -- 
+#http://www.clearfoundation.com/component/option,com_kunena/Itemid,232/catid,28/func,view/id,52645/limit,10/limitstart,10/
