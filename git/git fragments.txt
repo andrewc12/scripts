@@ -1,0 +1,35 @@
+cd ~/.ssh
+ssh-keygen -t rsa -C "email@example.com"
+ssh-add id_rsa
+clip < ~/.ssh/id_rsa.pub
+
+
+Now you need to enter a passphrase.
+
+    Account settings buttonGo to your Account Settings
+    SSH Keys menuClick "SSH Keys" in the left sidebar
+    SSH Key buttonClick "Add SSH key"
+    The key fieldPaste your key into the "Key" field
+    The Add key buttonClick "Add key"
+    Confirm the action by entering your GitHub password
+
+
+ssh -T git@github.com
+# Attempts to ssh to github
+
+
+
+
+touch FILE
+git init
+git add FILE
+git commit -m "first commit"
+git remote add origin git@github.com:andrewc12/REPOSITORY.git
+git push -u origin master
+
+
+git add FILE
+git commit -m "history"
+git push origin master
+
+
