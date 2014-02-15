@@ -77,10 +77,44 @@ cp /usr/lib/syslinux/memdisk /srv/tftp/
 
 
 
+cd /tmp
+wget  http://download.plop.at/files/bootmngr/plpbt-5.0.15-test.zip
+unzip plpbt-5.0.15-test.zip
+mv plpbt-5.0.15-test /srv/tftp/images/plop 
 
 
 
+cat > /srv/tftp/pxelinux.cfg/plop.cfg << "EOF"
 
+##########plop
+
+MENU BEGIN Plop
+MENU LABEL Plop
+MENU TITLE Plop boot loader
+
+LABEL Back
+MENU EXIT
+MENU LABEL Back
+
+LABEL Plop Live 
+kernel images/plop/plpbt.bin
+#append iso initrd=fog/dell/MyHirensBootCD.iso raw
+MENU LABEL Plop
+TEXT HELP
+Run Plop
+ENDTEXT
+
+LABEL Plop Install
+kernel images/plop/install/plpinstc.com 
+#append iso initrd=fog/dell/delldiags.iso raw
+MENU LABEL Install Plop
+TEXT HELP
+Run Plop Install
+ENDTEXT
+
+MENU END
+
+EOF
 
 
 
