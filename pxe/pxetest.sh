@@ -1,6 +1,5 @@
 #!/bin/sh
 dhcpdconf="/etc/dhcp/dhcpd.conf"
-#dhcpdconf="/tmp/dhcpd.conf"
 pxeip="10.0.0.26"
 tftppath="/srv/tftp"
 pxelinuxmenu="$tftppath/pxelinux.cfg/default"
@@ -12,6 +11,20 @@ dhcpleasestop="10.0.0.200"
 dhcpbroadcast="10.0.0.255"
 dhcprouter="10.0.0.138"
 dhcpdns="10.0.0.138"
+
+#Enter the Mac address of the computers you want to boot
+#or comment out ignore unknown-clients; below
+pxemac1="08:00:27:F4:1E:9C"
+pxemac2="08:00:27:F4:1E:9C"
+pxemac3="08:00:27:F4:1E:9C"
+pxemac4="08:00:27:F4:1E:9C"
+
+
+
+#fix this with regex
+czpath="http://downloads.sourceforge.net/project/clonezilla/clonezilla_live_stable/2.2.1-25"
+czurl="clonezilla-live-2.2.1-25-i686-pae.zip"
+
 
 installclonezilla=0
 installplop=1
@@ -32,6 +45,7 @@ subnet $dhcpsubnet netmask $dhcpnetmask {
     next-server $pxeip;
 }
 
+#chainloading
 if exists user-class and option user-class = "gPXE" {
     filename "pxelinux.0";
 } else {
@@ -42,7 +56,10 @@ if exists user-class and option user-class = "gPXE" {
 #Find out if this works 
 #if substring(option vendor-class-identifier, 0, 9) = "PXEClient" {filename "gpxelinux.0";}
 #if exists user-class and option user-class = "gPXE" {filename "pxelinux.0";}
-host 1 { hardware ethernet 08:00:27:F4:1E:9C; }
+host 1 { hardware ethernet $pxemac1; }
+host 2 { hardware ethernet $pxemac2; }
+host 3 { hardware ethernet $pxemac3; }
+host 4 { hardware ethernet $pxemac4; }
 
 EOF
 /etc/init.d/isc-dhcp-server restart
@@ -73,10 +90,18 @@ if [ "$installclonezilla" -gt 0 ]
 then
 
 ##########
-
 #Extract the latest version
-cat >> $pxelinuxmenu << EOF
+mkdir /tmp/clonezilla
+cd /tmp
+wget $czpath/$czurl #http://downloads.sourceforge.net/project/clonezilla/clonezilla_live_stable/2.2.1-25/clonezilla-live-2.2.1-25-i686-pae.zip
+cd /tmp/clonezilla
+unzip ../$czurl #clonezilla-live-2.2.1-25-i686-pae.zip
+cd ..
+mv clonezilla $tftppath/images/clonezilla
 
+
+
+cat >> $pxelinuxmenu << EOF
 label clonezilla
 menu label Clonezilla
   kernel images/clonezilla/live/vmlinuz
