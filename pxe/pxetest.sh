@@ -42,9 +42,9 @@ pxemac4="08:00:27:F4:1E:9C"
 #echo ${FILE%%/*}  # ==> nil
 #echo ${FILE%.c}   # ==> /home/user/src/prog
 
+#done test
 #fix this with regex
-czpath="http://downloads.sourceforge.net/project/clonezilla/clonezilla_live_stable/2.2.1-25"
-czurl="clonezilla-live-2.2.1-25-i686-pae.zip"
+czpaeurl="http://downloads.sourceforge.net/project/clonezilla/clonezilla_live_stable/2.2.1-25/clonezilla-live-2.2.1-25-i686-pae.zip"
 
 
 installclonezilla=0
@@ -114,9 +114,9 @@ then
 #Extract the latest version
 mkdir /tmp/clonezilla
 cd /tmp
-wget $czpath/$czurl #http://downloads.sourceforge.net/project/clonezilla/clonezilla_live_stable/2.2.1-25/clonezilla-live-2.2.1-25-i686-pae.zip
+wget $czpaeurl #http://downloads.sourceforge.net/project/clonezilla/clonezilla_live_stable/2.2.1-25/clonezilla-live-2.2.1-25-i686-pae.zip
 cd /tmp/clonezilla
-unzip ../$czurl #clonezilla-live-2.2.1-25-i686-pae.zip
+unzip ../${czpaeurl##*/} #clonezilla-live-2.2.1-25-i686-pae.zip
 cd ..
 mv clonezilla $tftppath/images/clonezilla
 
