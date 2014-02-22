@@ -1,4 +1,12 @@
 #!/bin/sh
+#13:30 < Riviera> wingman2: needs error handling; you don't check whether apt-get, cd, cp, wget, unzip, mkdir, etc. were successful,
+#                 you should quote your expansions ("/msg greybot umq") and, if it doesn't go against your idea of aesthetics, you
+#                 should indent your code to improve its readability
+#13:30 < Riviera> wingman2: but it doesn't look too bad
+#13:34 <greybot> "Double quote" _every_ expansion, and anything that could contain a special character, eg. "$var", "$@",
+#                "${array[@]}", "$(command)". Use 'single quotes' to make something literal, eg. 'Costs $5 USD'. See
+#                <http://mywiki.wooledge.org/Quotes>, <http://mywiki.wooledge.org/Arguments> and
+#                <http://wiki.bash-hackers.org/syntax/words>.
 dhcpdconf="/etc/dhcp/dhcpd.conf"
 pxeip="10.0.0.26"
 tftppath="/srv/tftp"
@@ -20,6 +28,19 @@ pxemac3="08:00:27:F4:1E:9C"
 pxemac4="08:00:27:F4:1E:9C"
 
 
+
+#URL='http://login:password@example.com/one/more/dir/file.exe?a=sth&b=sth'
+#AFTER_SLASH=${URL##*/}
+#echo "/one/more/dir/${AFTER_SLASH%%\?*}"
+#http://downloads.sourceforge.net/project/clonezilla/clonezilla_live_stable/2.2.1-25/clonezilla-live-2.2.1-25-i686-pae.zip
+
+
+#FILE=/home/user/src/prog.c
+#echo ${FILE#/*/}  # ==> user/src/prog.c
+#echo ${FILE##/*/} # ==> prog.c
+#echo ${FILE%/*}   # ==> /home/user/src
+#echo ${FILE%%/*}  # ==> nil
+#echo ${FILE%.c}   # ==> /home/user/src/prog
 
 #fix this with regex
 czpath="http://downloads.sourceforge.net/project/clonezilla/clonezilla_live_stable/2.2.1-25"
@@ -86,7 +107,7 @@ ui menu.c32
 menu title Utilities
 EOF
 
-if [ "$installclonezilla" -gt 0 ]
+if [ "$installclonezilla" -eq 1 ]
 then
 
 ##########
@@ -115,7 +136,7 @@ fi
 
 
 
-if [ "$installplop" -gt 0 ]
+if [ "$installplop" -eq 1 ]
 then
 
 ##########
