@@ -50,6 +50,25 @@ czpaeurl="http://downloads.sourceforge.net/project/clonezilla/clonezilla_live_st
 installclonezilla=0
 installplop=1
 
+# http://linuxcommand.org/wss0150.php
+#PROGNAME=$(basename $0)
+#function error_exit
+#{
+#	echo "${PROGNAME}: ${1:-"Unknown Error"}" 1>&2
+#	exit 1
+#}
+# Example call of the error_exit function.  Note the inclusion
+# of the LINENO environment variable.  It contains the current
+# line number.
+# error handling
+# Simplest of all
+#echo "Example of error with line number and message"
+#cd $some_directory || error_exit "$LINENO: Cannot change directory! Aborting"
+#rm *
+
+
+
+
 apt-get install isc-dhcp-server tftpd-hpa
 
 cat > $dhcpdconf << EOF
