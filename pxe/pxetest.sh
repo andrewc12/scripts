@@ -8,7 +8,7 @@
 #                <http://mywiki.wooledge.org/Quotes>, <http://mywiki.wooledge.org/Arguments> and
 #                <http://wiki.bash-hackers.org/syntax/words>.
 dhcpdconf="/etc/dhcp/dhcpd.conf"
-pxeip="10.0.0.26"
+pxeip="10.0.0.137"
 tftppath="/srv/tftp"
 pxelinuxmenu="$tftppath/pxelinux.cfg/default"
 syslinuxpath="/usr/lib/syslinux"
@@ -49,6 +49,8 @@ czpaeurl="http://downloads.sourceforge.net/project/clonezilla/clonezilla_live_st
 
 installclonezilla=0
 installplop=1
+installdebianamd64=1
+installdebiani386=1
 
 # http://linuxcommand.org/wss0150.php
 #PROGNAME=$(basename $0)
@@ -76,7 +78,7 @@ cat > $dhcpdconf << EOF
 default-lease-time 600;
 max-lease-time 7200;
 allow booting;
-ignore unknown-clients;
+#ignore unknown-clients;
 subnet $dhcpsubnet netmask $dhcpnetmask {
     range $dhcpleasestart $dhcpleasestop;
     option broadcast-address $dhcpbroadcast;
@@ -195,6 +197,72 @@ EOF
 
 fi
 
+
+if [ "$installdebianamd64" -eq 1 ]
+then
+##########   
+mkdir /tmp/diamd64
+cd /tmp/diamd64
+wget ftp://ftp.debian.org/debian/dists/wheezy/main/installer-amd64/current/images/netboot/netboot.tar.gz
+tar -xvf netboot.tar.gz
+mkdir -p $tftppath/debian-installer/
+mv debian-installer/amd64 $tftppath/debian-installer/.
+
+cat >> $pxelinuxmenu << EOF
+
+MENU BEGIN DIamd64
+MENU LABEL Install debian amd64
+MENU TITLE Install debian amd64
+
+LABEL Back
+MENU EXIT
+MENU LABEL Back
+
+MENU INCLUDE debian-installer/amd64/boot-screens/menu.cfg
+
+MENU END
+
+EOF
+##########
+
+fi    
+    
+    
+    
+    
+    
+    
+
+
+if [ "$installdebiani386" -eq 1 ]
+then
+##########   
+mkdir /tmp/dii386
+cd /tmp/dii386
+wget ftp://ftp.debian.org/debian/dists/wheezy/main/installer-i386/current/images/netboot/netboot.tar.gz
+tar -xvf netboot.tar.gz
+mkdir -p $tftppath/debian-installer/
+mv debian-installer/i386 $tftppath/debian-installer/.
+
+cat >> $pxelinuxmenu << EOF
+
+MENU BEGIN DIi386
+MENU LABEL Install debian i386
+MENU TITLE Install debian i386
+
+LABEL Back
+MENU EXIT
+MENU LABEL Back
+
+MENU INCLUDE debian-installer/i386/boot-screens/menu.cfg
+
+MENU END
+
+EOF
+##########
+
+fi    
+        
 
 
 /etc/init.d/tftpd-hpa restart
