@@ -135,7 +135,7 @@ then
 #Extract the latest version
 mkdir /tmp/clonezilla
 cd /tmp
-wget $czpaeurl #http://downloads.sourceforge.net/project/clonezilla/clonezilla_live_stable/2.2.1-25/clonezilla-live-2.2.1-25-i686-pae.zip
+wget -c$czpaeurl #http://downloads.sourceforge.net/project/clonezilla/clonezilla_live_stable/2.2.1-25/clonezilla-live-2.2.1-25-i686-pae.zip
 cd /tmp/clonezilla
 unzip ../${czpaeurl##*/} #clonezilla-live-2.2.1-25-i686-pae.zip
 cd ..
@@ -162,7 +162,7 @@ then
 
 ##########
 cd /tmp
-wget  http://download.plop.at/files/bootmngr/plpbt-5.0.15-test.zip
+wget -c http://download.plop.at/files/bootmngr/plpbt-5.0.15-test.zip
 unzip plpbt-5.0.15-test.zip
 mv plpbt-5.0.15-test $tftppath/images/plop
 cat >> $pxelinuxmenu << EOF
@@ -203,7 +203,7 @@ then
 ##########   
 mkdir /tmp/diamd64
 cd /tmp/diamd64
-wget ftp://ftp.debian.org/debian/dists/wheezy/main/installer-amd64/current/images/netboot/netboot.tar.gz
+wget -cftp://ftp.debian.org/debian/dists/wheezy/main/installer-amd64/current/images/netboot/netboot.tar.gz
 tar -xvf netboot.tar.gz
 mkdir -p $tftppath/debian-installer/
 mv debian-installer/amd64 $tftppath/debian-installer/.
@@ -239,7 +239,7 @@ then
 ##########   
 mkdir /tmp/dii386
 cd /tmp/dii386
-wget ftp://ftp.debian.org/debian/dists/wheezy/main/installer-i386/current/images/netboot/netboot.tar.gz
+wget -cftp://ftp.debian.org/debian/dists/wheezy/main/installer-i386/current/images/netboot/netboot.tar.gz
 tar -xvf netboot.tar.gz
 mkdir -p $tftppath/debian-installer/
 mv debian-installer/i386 $tftppath/debian-installer/.
