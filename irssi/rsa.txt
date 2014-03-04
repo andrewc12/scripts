@@ -1,0 +1,71 @@
+adduser andrew
+sudo su andrew
+
+
+ssh-keygen -t rsa
+Generating public/private rsa key pair.
+Enter file in which to save the key (/demo/.ssh/id_rsa): 
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in /demo/.ssh/id_rsa.
+Your public key has been saved in /demo/.ssh/id_rsa.pub.
+The key fingerprint is:
+4a:dd:0a:c6:35:4e:3f:ed:27:38:8c:74:44:4d:93:67 demo@a
+The key's randomart image is:
++--[ RSA 2048]----+
+|          .oo.   |
+|         .  o.E  |
+|        + .  o   |
+|     . = = .     |
+|      = S = .    |
+|     o + = +     |
+|      . o + o .  |
+|           . o   |
+|                 |
++-----------------+
+
+
+The public key is now located in /demo/.ssh/id_rsa.pub
+cp .ssh/id_rsa.pub .ssh/authorized_keys
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+irssi.org/themes.
+
+wget irssi.org/themefiles/xchat.theme
+
+To load a theme (located in ~/.irssi/), use:
+
+/set theme xchat
+
+
+
+
+
+
+
+
+wget 
+wget http://scripts.irssi.org/scripts/nicklist.pl
+wget http://dave.waxman.org/irssi/xchatnickcolor.pl
+
+
+
+
+
+
+/ignore * joins
+/ignore * parts
+/ignore * quits
