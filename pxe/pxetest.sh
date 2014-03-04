@@ -47,10 +47,11 @@ pxemac4="08:00:27:F4:1E:9C"
 czpaeurl="http://downloads.sourceforge.net/project/clonezilla/clonezilla_live_stable/2.2.1-25/clonezilla-live-2.2.1-25-i686-pae.zip"
 
 
-installclonezilla=0
+installclonezilla=1
 installplop=1
 installdebianamd64=1
 installdebiani386=1
+installdebianamd64preseed=1
 
 # http://linuxcommand.org/wss0150.php
 #PROGNAME=$(basename $0)
@@ -135,7 +136,7 @@ then
 #Extract the latest version
 mkdir /tmp/clonezilla
 cd /tmp
-wget -c$czpaeurl #http://downloads.sourceforge.net/project/clonezilla/clonezilla_live_stable/2.2.1-25/clonezilla-live-2.2.1-25-i686-pae.zip
+wget -c $czpaeurl #http://downloads.sourceforge.net/project/clonezilla/clonezilla_live_stable/2.2.1-25/clonezilla-live-2.2.1-25-i686-pae.zip
 cd /tmp/clonezilla
 unzip ../${czpaeurl##*/} #clonezilla-live-2.2.1-25-i686-pae.zip
 cd ..
@@ -156,13 +157,12 @@ fi
 
 
 
-
+################################################   
 if [ "$installplop" -eq 1 ]
 then
 
-##########
 cd /tmp
-wget -c http://download.plop.at/files/bootmngr/plpbt-5.0.15-test.zip
+wget -c  http://download.plop.at/files/bootmngr/plpbt-5.0.15-test.zip
 unzip plpbt-5.0.15-test.zip
 mv plpbt-5.0.15-test $tftppath/images/plop
 cat >> $pxelinuxmenu << EOF
@@ -193,17 +193,23 @@ ENDTEXT
 MENU END
 
 EOF
-##########
 
 fi
+################################################   
 
 
+
+
+
+
+
+
+################################################   
 if [ "$installdebianamd64" -eq 1 ]
 then
-##########   
 mkdir /tmp/diamd64
 cd /tmp/diamd64
-wget -cftp://ftp.debian.org/debian/dists/wheezy/main/installer-amd64/current/images/netboot/netboot.tar.gz
+wget -c ftp://ftp.debian.org/debian/dists/wheezy/main/installer-amd64/current/images/netboot/netboot.tar.gz
 tar -xvf netboot.tar.gz
 mkdir -p $tftppath/debian-installer/
 mv debian-installer/amd64 $tftppath/debian-installer/.
@@ -223,9 +229,9 @@ MENU INCLUDE debian-installer/amd64/boot-screens/menu.cfg
 MENU END
 
 EOF
-##########
 
 fi    
+################################################   
     
     
     
@@ -233,13 +239,12 @@ fi
     
     
 
-
+################################################   
 if [ "$installdebiani386" -eq 1 ]
 then
-##########   
 mkdir /tmp/dii386
 cd /tmp/dii386
-wget -cftp://ftp.debian.org/debian/dists/wheezy/main/installer-i386/current/images/netboot/netboot.tar.gz
+wget -c ftp://ftp.debian.org/debian/dists/wheezy/main/installer-i386/current/images/netboot/netboot.tar.gz
 tar -xvf netboot.tar.gz
 mkdir -p $tftppath/debian-installer/
 mv debian-installer/i386 $tftppath/debian-installer/.
@@ -259,10 +264,45 @@ MENU INCLUDE debian-installer/i386/boot-screens/menu.cfg
 MENU END
 
 EOF
-##########
 
 fi    
+################################################   
         
+
+
+
+    
+    
+    
+    
+    
+
+##################################################
+if [ "$installdebianamd64preseed" -eq 1 ]
+then
+cat >> $pxelinuxmenu << EOF
+LABEL DIamd64preseed
+MENU LABEL Install debian amd64 preseed
+        kernel debian-installer/amd64/linux
+        append vga=normal initrd=debian-installer/amd64/initrd.gz auto=true interface=auto netcfg/dhcp_timeout=60 netcfg/choose_interface=auto priority=critical preseed/url=tftp://$pxeip/debian-installer/preseed.cfg DEBCONF_DEBUG=5
+#        IPAPPEND 2
+EOF
+fi    
+##################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /etc/init.d/tftpd-hpa restart
