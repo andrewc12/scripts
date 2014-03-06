@@ -9,7 +9,7 @@
 #                <http://wiki.bash-hackers.org/syntax/words>.
 dhcpdconf="/etc/dhcp/dhcpd.conf"
 export pxeip="10.0.0.137"
-tftppath="/srv/tftp"
+export tftppath="/srv/tftp"
 export pxelinuxmenu="$tftppath/pxelinux.cfg/default"
 syslinuxpath="/usr/lib/syslinux"
 dhcpsubnet="10.0.0.0"
@@ -221,26 +221,10 @@ fi
 #################################################################################################################   
 if [ "$installdebiani386" -eq 1 ]
 then
-    cd
-    
-    
+    cd    
     export debarch="i386"
-    mkdir /tmp/di$debarch
-    cd /tmp/di$debarch
-    wget -c ftp://ftp.debian.org/debian/dists/wheezy/main/installer-$debarch/current/images/netboot/netboot.tar.gz
-    tar -xvf netboot.tar.gz
-    mkdir -p $tftppath/debian-installer/
-    mv debian-installer/$debarch $tftppath/debian-installer/.
-    cat >> $pxelinuxmenu << EOF
-MENU BEGIN DI$debarch
-MENU LABEL Install debian $debarch
-MENU TITLE Install debian $debarch
-LABEL Back
-MENU EXIT
-MENU LABEL Back
-MENU INCLUDE debian-installer/$debarch/boot-screens/menu.cfg
-MENU END
-EOF
+    ./installdebian.sh
+
 fi    
 #################################################################################################################   
         
@@ -257,7 +241,7 @@ fi
 if [ "$installdebianamd64preseed" -eq 1 ]
 then
     cd
-    ./debianamd64preseed
+    ./debianamd64preseed.sh
 
 fi    
 ##############################################################################################################
