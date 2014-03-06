@@ -190,7 +190,11 @@ then
     cd    
     export debarch="amd64"
     ./installdebian.sh
-
+    if [ "$installdebianpreseed" -eq 1 ]
+    then
+        cd
+        ./installdebianpreseed.sh    
+    fi    
 fi        
 #################################################################################################################   
     
@@ -201,18 +205,17 @@ then
     cd    
     export debarch="i386"
     ./installdebian.sh
-
+    if [ "$installdebianpreseed" -eq 1 ]
+    then
+        cd
+        ./installdebianpreseed.sh    
+    fi    
 fi    
 #################################################################################################################   
         
 
 ##############################################################################################################
-if [ "$installdebianpreseed" -eq 1 ]
-then
-    cd
-    ./installdebianpreseed.sh
 
-fi    
 ##############################################################################################################
 
 /etc/init.d/tftpd-hpa restart
