@@ -193,23 +193,11 @@ fi
 #################################################################################################################   
 if [ "$installdebianamd64" -eq 1 ]
 then
-    mkdir /tmp/diamd64
-    cd /tmp/diamd64
-    wget -c ftp://ftp.debian.org/debian/dists/wheezy/main/installer-amd64/current/images/netboot/netboot.tar.gz
-    tar -xvf netboot.tar.gz
-    mkdir -p $tftppath/debian-installer/
-    mv debian-installer/amd64 $tftppath/debian-installer/.
-    cat >> $pxelinuxmenu << EOF
-MENU BEGIN DIamd64
-MENU LABEL Install debian amd64
-MENU TITLE Install debian amd64
-LABEL Back
-MENU EXIT
-MENU LABEL Back
-MENU INCLUDE debian-installer/amd64/boot-screens/menu.cfg
-MENU END
-EOF
-fi    
+    cd    
+    export debarch="amd64"
+    ./installdebian.sh
+
+fi        
 #################################################################################################################   
     
     
