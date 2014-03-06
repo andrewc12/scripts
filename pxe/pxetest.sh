@@ -8,9 +8,9 @@
 #                <http://mywiki.wooledge.org/Quotes>, <http://mywiki.wooledge.org/Arguments> and
 #                <http://wiki.bash-hackers.org/syntax/words>.
 dhcpdconf="/etc/dhcp/dhcpd.conf"
-pxeip="10.0.0.137"
+export pxeip="10.0.0.137"
 tftppath="/srv/tftp"
-pxelinuxmenu="$tftppath/pxelinux.cfg/default"
+export pxelinuxmenu="$tftppath/pxelinux.cfg/default"
 syslinuxpath="/usr/lib/syslinux"
 dhcpsubnet="10.0.0.0"
 dhcpnetmask="255.255.255.0"
@@ -129,73 +129,59 @@ ui menu.c32
 menu title Utilities
 EOF
 
+##############################################################################################################
 if [ "$installclonezilla" -eq 1 ]
 then
-
-##########
-#Extract the latest version
-mkdir /tmp/clonezilla
-cd /tmp
-wget -c $czpaeurl #http://downloads.sourceforge.net/project/clonezilla/clonezilla_live_stable/2.2.1-25/clonezilla-live-2.2.1-25-i686-pae.zip
-cd /tmp/clonezilla
-unzip ../${czpaeurl##*/} #clonezilla-live-2.2.1-25-i686-pae.zip
-cd ..
-mv clonezilla $tftppath/images/clonezilla
-
-
-
-cat >> $pxelinuxmenu << EOF
+    #Extract the latest version
+    mkdir /tmp/clonezilla
+    cd /tmp
+    wget -c $czpaeurl #http://downloads.sourceforge.net/project/clonezilla/clonezilla_live_stable/2.2.1-25/clonezilla-live-2.2.1-25-i686-pae.zip
+    cd /tmp/clonezilla
+    unzip ../${czpaeurl##*/} #clonezilla-live-2.2.1-25-i686-pae.zip
+    cd ..
+    mv clonezilla $tftppath/images/clonezilla
+    cat >> $pxelinuxmenu << EOF
 label clonezilla
 menu label Clonezilla
   kernel images/clonezilla/live/vmlinuz
   append boot=live username=user config  noswap edd=on nomodeset noprompt locales= keyboard-layouts= ocs_live_run="ocs-live-general" ocs_live_extra_param="" ocs_live_batch=no vga=788 nosplash fetch=tftp://$pxeip/images/clonezilla/live/filesystem.squashfs i915.blacklist=yes radeonhd.blacklist=yes nouveau.blacklist=yes vmwgfx.enable_fbdev=no
   initrd images/clonezilla/live/initrd.img
 EOF
-##########
 fi
+##############################################################################################################
 
 
 
-
-################################################   
+#################################################################################################################   
 if [ "$installplop" -eq 1 ]
 then
-
-cd /tmp
-wget -c  http://download.plop.at/files/bootmngr/plpbt-5.0.15-test.zip
-unzip plpbt-5.0.15-test.zip
-mv plpbt-5.0.15-test $tftppath/images/plop
-cat >> $pxelinuxmenu << EOF
-
-
+    cd /tmp
+    wget -c  http://download.plop.at/files/bootmngr/plpbt-5.0.15-test.zip
+    unzip plpbt-5.0.15-test.zip
+    mv plpbt-5.0.15-test $tftppath/images/plop
+    cat >> $pxelinuxmenu << EOF
 MENU BEGIN Plop
 MENU LABEL Plop
 MENU TITLE Plop boot loader
-
 LABEL Back
 MENU EXIT
 MENU LABEL Back
-
 LABEL Plop Live
 kernel images/plop/plpbt.bin
 MENU LABEL Plop
 TEXT HELP
 Run Plop
 ENDTEXT
-
 LABEL Plop Install
 kernel images/plop/install/plpinstc.com
 MENU LABEL Install Plop
 TEXT HELP
 Run Plop Install
 ENDTEXT
-
 MENU END
-
 EOF
-
 fi
-################################################   
+#################################################################################################################   
 
 
 
@@ -204,34 +190,27 @@ fi
 
 
 
-################################################   
+#################################################################################################################   
 if [ "$installdebianamd64" -eq 1 ]
 then
-mkdir /tmp/diamd64
-cd /tmp/diamd64
-wget -c ftp://ftp.debian.org/debian/dists/wheezy/main/installer-amd64/current/images/netboot/netboot.tar.gz
-tar -xvf netboot.tar.gz
-mkdir -p $tftppath/debian-installer/
-mv debian-installer/amd64 $tftppath/debian-installer/.
-
-cat >> $pxelinuxmenu << EOF
-
+    mkdir /tmp/diamd64
+    cd /tmp/diamd64
+    wget -c ftp://ftp.debian.org/debian/dists/wheezy/main/installer-amd64/current/images/netboot/netboot.tar.gz
+    tar -xvf netboot.tar.gz
+    mkdir -p $tftppath/debian-installer/
+    mv debian-installer/amd64 $tftppath/debian-installer/.
+    cat >> $pxelinuxmenu << EOF
 MENU BEGIN DIamd64
 MENU LABEL Install debian amd64
 MENU TITLE Install debian amd64
-
 LABEL Back
 MENU EXIT
 MENU LABEL Back
-
 MENU INCLUDE debian-installer/amd64/boot-screens/menu.cfg
-
 MENU END
-
 EOF
-
 fi    
-################################################   
+#################################################################################################################   
     
     
     
@@ -239,34 +218,31 @@ fi
     
     
 
-################################################   
+#################################################################################################################   
 if [ "$installdebiani386" -eq 1 ]
 then
-mkdir /tmp/dii386
-cd /tmp/dii386
-wget -c ftp://ftp.debian.org/debian/dists/wheezy/main/installer-i386/current/images/netboot/netboot.tar.gz
-tar -xvf netboot.tar.gz
-mkdir -p $tftppath/debian-installer/
-mv debian-installer/i386 $tftppath/debian-installer/.
-
-cat >> $pxelinuxmenu << EOF
-
-MENU BEGIN DIi386
-MENU LABEL Install debian i386
-MENU TITLE Install debian i386
-
+    cd
+    
+    
+    export debarch="i386"
+    mkdir /tmp/di$debarch
+    cd /tmp/di$debarch
+    wget -c ftp://ftp.debian.org/debian/dists/wheezy/main/installer-$debarch/current/images/netboot/netboot.tar.gz
+    tar -xvf netboot.tar.gz
+    mkdir -p $tftppath/debian-installer/
+    mv debian-installer/$debarch $tftppath/debian-installer/.
+    cat >> $pxelinuxmenu << EOF
+MENU BEGIN DI$debarch
+MENU LABEL Install debian $debarch
+MENU TITLE Install debian $debarch
 LABEL Back
 MENU EXIT
 MENU LABEL Back
-
-MENU INCLUDE debian-installer/i386/boot-screens/menu.cfg
-
+MENU INCLUDE debian-installer/$debarch/boot-screens/menu.cfg
 MENU END
-
 EOF
-
 fi    
-################################################   
+#################################################################################################################   
         
 
 
@@ -277,18 +253,14 @@ fi
     
     
 
-##################################################
+##############################################################################################################
 if [ "$installdebianamd64preseed" -eq 1 ]
 then
-cat >> $pxelinuxmenu << EOF
-LABEL DIamd64preseed
-MENU LABEL Install debian amd64 preseed
-        kernel debian-installer/amd64/linux
-        append vga=normal initrd=debian-installer/amd64/initrd.gz auto=true interface=auto netcfg/dhcp_timeout=60 netcfg/choose_interface=auto priority=critical preseed/url=tftp://$pxeip/debian-installer/preseed.cfg DEBCONF_DEBUG=5
-#        IPAPPEND 2
-EOF
+    cd
+    ./debianamd64preseed
+
 fi    
-##################################################
+##############################################################################################################
 
 
 
