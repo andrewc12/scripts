@@ -7,6 +7,17 @@
 #                "${array[@]}", "$(command)". Use 'single quotes' to make something literal, eg. 'Costs $5 USD'. See
 #                <http://mywiki.wooledge.org/Quotes>, <http://mywiki.wooledge.org/Arguments> and
 #                <http://wiki.bash-hackers.org/syntax/words>.
+#
+
+
+#function e {
+#echo $1
+#}
+#e
+
+
+
+
 dhcpdconf="/etc/dhcp/dhcpd.conf"
 export pxeip="10.0.0.137"
 export tftppath="/srv/tftp"
@@ -69,6 +80,31 @@ installdebianpreseed=1
 #cd $some_directory || error_exit "$LINENO: Cannot change directory! Aborting"
 #rm *
 
+
+#16:45 < checkbot> wingman2: shellcheck.net says: Line 18: Use
+#      <<- instead of << if you want to indent the end token.
+#      Line 169: Consider using ( subshell ) or 'cd foo||exit'
+#      instead. Line 3: Double quote to prevent globbing and
+#      word splitting (and 5 more)
+
+installdebian(){
+    mkdir /tmp/di$debarch
+    cd /tmp/di$debarch
+    wget -c ftp://ftp.debian.org/debian/dists/wheezy/main/installer-$debarch/current/images/netboot/netboot.tar.gz
+    tar -xvf netboot.tar.gz
+    mkdir -p $tftppath/debian-installer/
+    mv debian-installer/$debarch $tftppath/debian-installer/.
+    cat >> $pxelinuxmenu << EOF
+MENU BEGIN DI$debarch
+MENU LABEL Install debian $debarch
+MENU TITLE Install debian $debarch
+LABEL Back
+MENU EXIT
+MENU LABEL Back
+MENU INCLUDE debian-installer/$debarch/boot-screens/menu.cfg
+MENU END
+EOF
+}
 
 
 
@@ -166,7 +202,7 @@ if [ "$installdebianamd64" -eq 1 ]
 then
     cd    
     export debarch="amd64"
-    ./installdebian.sh
+    installdebian
     if [ "$installdebianpreseed" -eq 1 ]
     then
         cd
@@ -181,7 +217,7 @@ if [ "$installdebiani386" -eq 1 ]
 then
     cd    
     export debarch="i386"
-    ./installdebian.sh
+    installdebian
     if [ "$installdebianpreseed" -eq 1 ]
     then
         cd
