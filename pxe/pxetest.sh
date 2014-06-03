@@ -17,6 +17,7 @@
 
 
 export pxeip=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1 -d'/')
+dhcpbroadcast=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $4}')
 
 dhcpdconf="/etc/dhcp/dhcpd.conf"
 #export pxeip="10.0.0.137"
@@ -27,7 +28,7 @@ dhcpsubnet="10.0.0.0"
 dhcpnetmask="255.255.255.0"
 dhcpleasestart="10.0.0.180"
 dhcpleasestop="10.0.0.200"
-dhcpbroadcast="10.0.0.255"
+#dhcpbroadcast="10.0.0.255"
 dhcprouter="10.0.0.138"
 dhcpdns="10.0.0.138"
 
@@ -62,7 +63,7 @@ installclonezilla=0
 installplop=0
 installdebianamd64=1
 installdebiani386=0
-installdebianpreseed=0
+installdebianpreseed=1
 
 # http://linuxcommand.org/wss0150.php
 #PROGNAME=$(basename $0)
@@ -103,6 +104,15 @@ MENU EXIT
 MENU LABEL Back
 MENU INCLUDE debian-installer/$debarch/boot-screens/menu.cfg
 MENU END
+EOF
+}
+
+installdebianpreseed(){
+    cat >> $pxelinuxmenu << EOF
+LABEL preseedDI$debarch
+MENU LABEL Install debian $debarch preseed
+	kernel debian-installer/$debarch/linux
+	append vga=normal initrd=debian-installer/$debarch/initrd.gz auto=true interface=auto netcfg/dhcp_timeout=60 netcfg/choose_interface=auto priority=critical preseed/url=tftp://$pxeip/debian-installer/preseed.cfg DEBCONF_DEBUG=5
 EOF
 }
 
@@ -206,7 +216,7 @@ then
     if [ "$installdebianpreseed" -eq 1 ]
     then
         cd
-        ./installdebianpreseed.sh    
+        installdebianpreseed    
     fi    
 fi        
 #################################################################################################################   
@@ -221,7 +231,7 @@ then
     if [ "$installdebianpreseed" -eq 1 ]
     then
         cd
-        ./installdebianpreseed.sh    
+        installdebianpreseed    
     fi    
 fi    
 #################################################################################################################   
