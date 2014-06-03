@@ -58,11 +58,11 @@ pxemac4="08:00:27:F4:1E:9C"
 czpaeurl="http://downloads.sourceforge.net/project/clonezilla/clonezilla_live_stable/2.2.1-25/clonezilla-live-2.2.1-25-i686-pae.zip"
 
 
-installclonezilla=1
-installplop=1
+installclonezilla=0
+installplop=0
 installdebianamd64=1
-installdebiani386=1
-installdebianpreseed=1
+installdebiani386=0
+installdebianpreseed=0
 
 # http://linuxcommand.org/wss0150.php
 #PROGNAME=$(basename $0)
