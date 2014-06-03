@@ -16,10 +16,10 @@
 #e
 
 
-
+export pxeip=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1 -d'/')
 
 dhcpdconf="/etc/dhcp/dhcpd.conf"
-export pxeip="10.0.0.137"
+#export pxeip="10.0.0.137"
 export tftppath="/srv/tftp"
 export pxelinuxmenu="$tftppath/pxelinux.cfg/default"
 syslinuxpath="/usr/lib/syslinux"
