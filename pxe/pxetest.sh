@@ -30,13 +30,10 @@ PXEMAC2="08:00:27:F4:1E:9C"
 PXEMAC3="08:00:27:F4:1E:9C"
 PXEMAC4="08:00:27:F4:1E:9C"
 
-
-
 #URL='http://login:password@example.com/one/more/dir/file.exe?a=sth&b=sth'
 #AFTER_SLASH=${URL##*/}
 #echo "/one/more/dir/${AFTER_SLASH%%\?*}"
 #http://downloads.sourceforge.net/project/clonezilla/clonezilla_live_stable/2.2.1-25/clonezilla-live-2.2.1-25-i686-pae.zip
-
 
 #FILE=/home/user/src/prog.c
 #echo ${FILE#/*/}  # ==> user/src/prog.c
@@ -48,7 +45,6 @@ PXEMAC4="08:00:27:F4:1E:9C"
 #done test
 #fix this with regex
 CZPAEURL="http://downloads.sourceforge.net/project/clonezilla/clonezilla_live_stable/2.2.1-25/clonezilla-live-2.2.1-25-i686-pae.zip"
-
 
 INSTALLCLONEZILLA=0
 INSTALLPLOP=0
@@ -100,8 +96,6 @@ MENU LABEL Install debian ${DEBARCH} preseed
 EOF
 }
 
-
-
 apt-get install isc-dhcp-server tftpd-hpa
 
 cat > $DHCPDCONF << EOF
@@ -136,8 +130,6 @@ host 4 { hardware ethernet $PXEMAC4; }
 
 EOF
 /etc/init.d/isc-dhcp-server restart
-
-
 
 #In this section we set up a menu to load and boot files from the network
 #Files to boot
@@ -182,31 +174,47 @@ fi
 if [ "$INSTALLPLOP" -eq 1 ]
 then
     cd
-    ./installplop.sh    
+    ./installplop.sh
 fi
-#################################################################################################################   
+##############################################################################################################
 if [ "$INSTALLDEBIANAMD64" -eq 1 ]
 then
-    cd    
     export DEBARCH="amd64"
     installdebian
     if [ "$INSTALLDEBIANPRESEED" -eq 1 ]
     then
-        cd
-        installdebianpreseed    
-    fi    
-fi        
-#################################################################################################################   
+        installdebianpreseed
+    fi
+fi
+##############################################################################################################
 if [ "$INSTALLDEBIANI386" -eq 1 ]
 then
-    cd    
     export DEBARCH="i386"
     installdebian
     if [ "$INSTALLDEBIANPRESEED" -eq 1 ]
     then
-        cd
-        installdebianpreseed    
-    fi    
-fi    
+        installdebianpreseed
+    fi
+fi
 ##############################################################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /etc/init.d/tftpd-hpa restart
