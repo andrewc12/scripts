@@ -92,30 +92,30 @@ INSTALLDEBIANPRESEED=1
 #      word splitting (and 5 more)
 
 installdebian(){
-    mkdir /tmp/di$DEBARCH
-    cd /tmp/di$DEBARCH
-    wget -c ftp://ftp.debian.org/debian/dists/wheezy/main/installer-$DEBARCH/current/images/netboot/netboot.tar.gz
+    mkdir /tmp/di${DEBARCH}
+    cd /tmp/di${DEBARCH}
+    wget -c ftp://ftp.debian.org/debian/dists/wheezy/main/installer-${DEBARCH}/current/images/netboot/netboot.tar.gz
     tar -xvf netboot.tar.gz
     mkdir -p $TFTPPATH/debian-installer/
-    mv debian-installer/$DEBARCH $TFTPPATH/debian-installer/.
+    mv debian-installer/${DEBARCH} $TFTPPATH/debian-installer/.
     cat >> $PXELINUXMENU << EOF
-MENU BEGIN DI$DEBARCH
-MENU LABEL Install debian $DEBARCH
-MENU TITLE Install debian $DEBARCH
+MENU BEGIN DI${DEBARCH}
+MENU LABEL Install debian ${DEBARCH}
+MENU TITLE Install debian ${DEBARCH}
 LABEL Back
 MENU EXIT
 MENU LABEL Back
-MENU INCLUDE debian-installer/$DEBARCH/boot-screens/menu.cfg
+MENU INCLUDE debian-installer/${DEBARCH}/boot-screens/menu.cfg
 MENU END
 EOF
 }
 
 installdebianpreseed(){
     cat >> $PXELINUXMENU << EOF
-LABEL preseedDI$DEBARCH
-MENU LABEL Install debian $DEBARCH preseed
-	kernel debian-installer/$DEBARCH/linux
-	append vga=normal initrd=debian-installer/$DEBARCH/initrd.gz auto=true interface=auto netcfg/dhcp_timeout=60 netcfg/choose_interface=auto priority=critical preseed/url=tftp://$PXEIP/debian-installer/preseed.cfg DEBCONF_DEBUG=5
+LABEL preseedDI${DEBARCH}
+MENU LABEL Install debian ${DEBARCH} preseed
+	kernel debian-installer/${DEBARCH}/linux
+	append vga=normal initrd=debian-installer/${DEBARCH}/initrd.gz auto=true interface=auto netcfg/dhcp_timeout=60 netcfg/choose_interface=auto priority=critical preseed/url=tftp://$PXEIP/debian-installer/preseed.cfg DEBCONF_DEBUG=5
 EOF
 }
 
