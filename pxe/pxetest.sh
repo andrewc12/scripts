@@ -1,23 +1,11 @@
 #!/bin/sh
-#TODO: change variable names to ${foo}
-#
-#
 #13:30 < Riviera> wingman2: needs error handling; you don't check whether apt-get, cd, cp, wget, unzip, mkdir, etc. were successful,
 #                 you should quote your expansions ("/msg greybot umq") and, if it doesn't go against your idea of aesthetics, you
 #                 should indent your code to improve its readability
-#13:30 < Riviera> wingman2: but it doesn't look too bad
 #13:34 <greybot> "Double quote" _every_ expansion, and anything that could contain a special character, eg. "$var", "$@",
 #                "${array[@]}", "$(command)". Use 'single quotes' to make something literal, eg. 'Costs $5 USD'. See
 #                <http://mywiki.wooledge.org/Quotes>, <http://mywiki.wooledge.org/Arguments> and
 #                <http://wiki.bash-hackers.org/syntax/words>.
-#
-
-
-#function e {
-#echo $1
-#}
-#e
-
 
 export PXEIP=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1 -d'/')
 DHCPBROADCAST=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $4}')
@@ -83,13 +71,6 @@ INSTALLDEBIANPRESEED=1
 #echo "Example of error with line number and message"
 #cd $some_directory || error_exit "$LINENO: Cannot change directory! Aborting"
 #rm *
-
-
-#16:45 < checkbot> wingman2: shellcheck.net says: Line 18: Use
-#      <<- instead of << if you want to indent the end token.
-#      Line 169: Consider using ( subshell ) or 'cd foo||exit'
-#      instead. Line 3: Double quote to prevent globbing and
-#      word splitting (and 5 more)
 
 installdebian(){
     mkdir /tmp/di${DEBARCH}
@@ -197,19 +178,12 @@ menu label Clonezilla
   initrd images/clonezilla/live/initrd.img
 EOF
 fi
-##############################################################################################################
-
-
-
 #################################################################################################################   
 if [ "$INSTALLPLOP" -eq 1 ]
 then
     cd
-    ./INSTALLPLOP.sh    
+    ./installplop.sh    
 fi
-#################################################################################################################   
-
-
 #################################################################################################################   
 if [ "$INSTALLDEBIANAMD64" -eq 1 ]
 then
@@ -223,9 +197,6 @@ then
     fi    
 fi        
 #################################################################################################################   
-    
-
-#################################################################################################################   
 if [ "$INSTALLDEBIANI386" -eq 1 ]
 then
     cd    
@@ -237,11 +208,5 @@ then
         installdebianpreseed    
     fi    
 fi    
-#################################################################################################################   
-        
-
 ##############################################################################################################
-
-##############################################################################################################
-
 /etc/init.d/tftpd-hpa restart
