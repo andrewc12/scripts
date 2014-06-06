@@ -205,9 +205,36 @@ fi
 
 
 
+#cd /tmp
+#wget -c http://mirrors.xbmc.org/releases/XBMCbuntu/xbmcbuntu-13.0~gotham_amd64.iso
+#mkdir /mnt/iso
+#mount -o loop xbmcbuntu-13.0~gotham_amd64.iso /mnt/iso
+#mkdir /tmp/xbmcbuntu-13.0~gotham_amd64
+#cp -R /mnt/iso/* /tmp/xbmcbuntu-13.0~gotham_amd64
+#umount /mnt/iso
+#mv xbmcbuntu-13.0~gotham_amd64 /srv/tftp/images/.
 
 
 
+#apt-get install nfs-kernel-server
+
+#    /etc/exports
+#
+#    /srv/tftp/images/xbmcbuntu-13.0~gotham_amd64       10.0.0.0/255.255.255.0(async,no_root_squash,no_subtree_check,ro)
+#
+#service nfs-kernel-server restart
+#
+#label xbmc
+#  menu label ^Try XBMCbuntu without installing
+#  kernel images/xbmcbuntu-13.0~gotham_amd64/casper/vmlinuz
+#  append  boot=casper netboot=nfs nfsroot=10.0.0.191:/srv/tftp/images/xbmcbuntu-13.0~gotham_amd64/ initrd=images/xbmcbuntu-13.0~gotham_amd64/casper/initrd.lz --
+
+# label bootlocal
+#      menu label ^Boot Point of Sale
+#      menu default
+#      localboot 0
+#      timeout 80
+#      TOTALTIMEOUT 9000
 
 
 
