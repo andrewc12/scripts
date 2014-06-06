@@ -1,0 +1,141 @@
+wget http://mirrors.xbmc.org/releases/XBMCbuntu/xbmcbuntu-13.0~gotham_amd64.iso
+
+mkdir /mnt/iso
+mount -o loop xbmcbuntu-13.0~gotham_amd64.iso /mnt/iso
+
+mkdir /tmp/xbmcbuntu-13.0~gotham_amd64
+
+
+cp -R /mnt/iso/* /tmp/xbmcbuntu-13.0~gotham_amd64
+umount /mnt/iso
+
+mv xbmcbuntu-13.0~gotham_amd64 /srv/tftp/images/.
+
+
+
+apt-get install nfs-kernel-server
+
+    /etc/exports:
+
+    /srv/tftp/images/xbmcbuntu-13.0~gotham_amd64       10.0.0.0/255.255.255.0(async,no_root_squash,no_subtree_check,ro)
+
+service nfs-kernel-server restart
+
+label xbmc
+  menu label ^Try XBMCbuntu without installing
+  kernel images/xbmcbuntu-13.0~gotham_amd64/casper/vmlinuz
+  append  boot=casper netboot=nfs nfsroot=10.0.0.191:/srv/tftp/images/xbmcbuntu-13.0~gotham_amd64/ initrd=images/xbmcbuntu-13.0~gotham_amd64/casper/initrd.lz --
+
+
+ label bootlocal
+      menu label ^Boot Point of Sale
+      menu default
+      localboot 0
+      timeout 80
+      TOTALTIMEOUT 9000
+
+
+
+
+
+
+
+
+LABEL live-gutsy
+        kernel ubuntu-7.10-desktop/casper/vmlinuz
+        append root=/dev/nfs boot=casper netboot=nfs nfsroot=192.168.1.100:/data/images/diskless/ubuntu-7.10-desktop initrd=ubuntu-7.10-desktop/casper/initrd.gz quiet splash --
+
+LABEL live-hardy-i386
+        kernel hardy-i386/vmlinuz
+        append boot=casper netboot=nfs nfsroot=192.168.2.200:/srv/tftpboot/hardy-i386/mnt initrd=hardy-i386/initrd.gz --
+
+LABEL live-intrepid-i386
+        kernel intrepid-i386/vmlinuz
+        append boot=casper netboot=nfs nfsroot=192.168.2.200:/srv/tftpboot/intrepid-i386/mnt initrd=intrepid-i386/initrd.gz --
+
+Not
+
+
+
+
+
+
+
+
+
+
+
+
+
+label xbmc
+  menu label ^Try XBMCbuntu without installing
+  kernel images/xbmcbuntu-13.0~gotham_amd64/casper/vmlinuz
+  append  boot=casper initrd=images/xbmcbuntu-13.0~gotham_amd64/casper/initrd.lz fetch=tftp://10.0.0.191/images/xbmcbuntu-13.0~gotham_amd64/casper/filesystem.squashfs quiet splash --
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+label clonezilla
+
+menu label Clonezilla
+  
+kernel images/clonezilla/live/vmlinuz
+  
+append boot=live username=user config  noswap edd=on nomodeset noprompt locales= keyboard-layouts= ocs_live_run="ocs-live-general" ocs_live_extra_param="" ocs_live_batch=no vga=788 nosplash fetch=tftp://$pxeip/images/clonezilla/live/filesystem.squashfs i915.blacklist=yes radeonhd.blacklist=yes nouveau.blacklist=yes vmwgfx.enable_fbdev=no
+  
+initrd images/clonezilla/live/initrd.img
+
+
+
+
+
+
+default live
+label live
+  menu label ^Try XBMCbuntu without installing
+  kernel /casper/vmlinuz
+  append  boot=casper initrd=/casper/initrd.lz quiet splash --
+label live-install
+  menu label ^Install XBMCbuntu
+  kernel /casper/vmlinuz
+  append  file=/cdrom/preseed/ubuntu.seed boot=casper only-ubiquity debug-ubiquity initrd=/casper/in$
+label live-install-setdpi
+  menu label ^Install XBMCbuntu with fixed dpi (120x120)
+  kernel /casper/vmlinuz
+  append  file=/cdrom/preseed/ubuntu.seed boot=casper only-ubiquity debug-ubiquity xbmc=setdpi initr$
+label check
+  menu label ^Check disc for defects
+  kernel /casper/vmlinuz
+  append  boot=casper integrity-check initrd=/casper/initrd.lz quiet splash --
+label hd
+  menu label ^Boot from first hard disk
+  localboot 0x80
+
+
+
+
+
+                                          [ Read 20 lines ]
+^G Get Help     ^O WriteOut     ^R Read File    ^Y Prev Page    ^K Cut Text     ^C Cur Pos
+^X Exit         ^J Justify      ^W Where Is     ^V Next Page    ^U UnCut Text   ^T To Spell
+
+
+ label bootlocal
+      menu label ^Boot Point of Sale
+      menu default
+      localboot 0
+      timeout 80
+      TOTALTIMEOUT 9000
