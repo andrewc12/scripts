@@ -1,5 +1,13 @@
 #!/bin/bash
 
+
+
+#TODO:
+#Actually set up reverse SSH tunnel + private sshkey
+#Hostname 
+#Public sshkey for access
+
+#rev11 yes after omv extra package
 #rev10 autossh service
 #rev9 sysctl
 #rev8 autossh service + Reducing the number of worker threads on the web server
@@ -95,16 +103,6 @@ sed -i "s/noatime,errors=remount-ro 0 1/noatime,nodiratime,discard 0 0/g" /etc/f
 
 
 
-sed -i "s/worker_processes .;/worker_processes 1;/g" /etc/nginx/nginx.conf
-#sed -i "s/pm.max_children = .;/pm.max_children = 1;/g" /etc/php5/fpm/pool.d/openmediavault-webgui.conf
-#pm = ondemand
-#pm.max_children = 25
-sed -i "s/pm.max_children = 25/pm.max_children = 1/g" /etc/php5/fpm/pool.d/openmediavault-webgui.conf
-sed -i "s/pm = dynamic/pm = ondemand/g" /etc/php5/fpm/pool.d/www.conf
-sed -i "s/pm.max_children = 5/pm.max_children = 1/g" /etc/php5/fpm/pool.d/www.conf
-sed -i "s/;pm.process_idle_timeout = 10s;/pm.process_idle_timeout = 10s/g" /etc/php5/fpm/pool.d/www.conf
-#;pm.process_idle_timeout = 10s;
-
 cat >> /etc/sysctl.conf <<EOF
 vm.laptop_mode=5
 vm.dirty_writeback_centisecs=1500
@@ -143,7 +141,7 @@ apt-get install openmediavault
 
 wget http://omv-extras.org/openmediavault-omvextrasorg_latest_all.deb
 dpkg -i openmediavault-omvextrasorg_latest_all.deb
-apt-get install -f
+apt-get install -f -y
 apt-get update
 
 #cat > /etc/apt/sources.list.d/omv-extras-org-kralizec.list << EOF
@@ -164,6 +162,20 @@ apt-get update
 ##deb http://debian.yeasoft.net/btsync wheezy main
 #EOF
 #apt-get update
+
+
+
+sed -i "s/worker_processes .;/worker_processes 1;/g" /etc/nginx/nginx.conf
+#sed -i "s/pm.max_children = .;/pm.max_children = 1;/g" /etc/php5/fpm/pool.d/openmediavault-webgui.conf
+#pm = ondemand
+#pm.max_children = 25
+sed -i "s/pm.max_children = 25/pm.max_children = 1/g" /etc/php5/fpm/pool.d/openmediavault-webgui.conf
+sed -i "s/pm = dynamic/pm = ondemand/g" /etc/php5/fpm/pool.d/www.conf
+sed -i "s/pm.max_children = 5/pm.max_children = 1/g" /etc/php5/fpm/pool.d/www.conf
+sed -i "s/;pm.process_idle_timeout = 10s;/pm.process_idle_timeout = 10s/g" /etc/php5/fpm/pool.d/www.conf
+#;pm.process_idle_timeout = 10s;
+
+
 
 apt-get install autossh
 
