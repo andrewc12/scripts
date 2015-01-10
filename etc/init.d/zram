@@ -1,0 +1,35 @@
+### BEGIN INIT INFO
+# Provides:          zram
+# Required-Start:    $local_fs
+# Required-Stop:     $local_fs
+# Default-Start:     S
+# Default-Stop:      0 1 6
+# Short-Description: Use compressed RAM as in-memory swap
+# Description:       Use compressed RAM as in-memory swap
+### END INIT INFO
+
+SIZE=32
+RESERVE=32
+case "$1" in
+  "start")
+    for i in $(cat /proc/meminfo |grep 'MemAvailable:' | cut -f2 -d ':' | sed 's/ //g' |sed 's/.B//g')
+    do
+    SIZE=$(((i - (RESERVE*1024))*1024))
+    done
+
+    modprobe zram num_devices=1
+
+#    echo $(($SIZE*1024*1024)) > /sys/block/zram0/disksize
+    echo $SIZE > /sys/block/zram0/disksize
+    mkswap /dev/zram0
+    swapon /dev/zram0 -p 10
+    ;;
+  "stop")
+    swapoff /dev/zram0
+    modprobe -r zram
+    ;;
+  *)
+    echo "Usage: `basename $0` (start | stop)"
+    exit 1
+    ;;
+esac
