@@ -354,6 +354,8 @@ case "$1" in
 	;;
 esac
 EOF
+chmod +x /etc/init.d/autosshd
+insserv autosshd
 
 
 
