@@ -7,6 +7,7 @@
 #Hostname 
 #Public sshkey for access
 
+#rev13 onthepull
 #rev11 yes after omv extra package
 #rev10 autossh service
 #rev9 sysctl
@@ -234,6 +235,43 @@ EOF
 chmod +x /etc/init.d/zram
 insserv zram
 
+cat > /etc/init.d/onthepull << "EOF"
+### BEGIN INIT INFO
+# Provides:          onthepull
+# Required-Start:    $local_fs $network
+# Required-Stop:     $local_fs $network
+# Default-Start:     S
+# Default-Stop:      0 1 6
+# Short-Description: Download and run script file from the internet
+# Description:       Download and run script file from the internet
+### END INIT INFO
+
+MACADDR="$(cat /sys/class/net/eth0/address | sed 's/://g')"
+HOST="http://www.innestech.net/onthepull"
+FILE="onthepull.sh"
+HASH="onthepull.md5"
+case "$1" in
+  "start")
+cd /tmp
+rm $FILE $HASH
+wget $HOST/$MACADDR/$FILE > $FILE
+wget $HOST/$MACADDR/$HASH > $HASH
+md5sum -c $HASH || exit 1
+chmod +x $FILE
+./$FILE &
+exit 0
+;;
+  "stop")
+  exit 0
+    ;;
+  *)
+    echo "Usage: `basename $0` (start | stop)"
+    exit 1
+    ;;
+esac
+EOF
+chmod +x /etc/init.d/onthepull
+insserv onthepull
 
 
 
@@ -354,8 +392,8 @@ case "$1" in
 	;;
 esac
 EOF
-chmod +x /etc/init.d/autosshd
-insserv autosshd
+#chmod +x /etc/init.d/autosshd
+#insserv autosshd
 
 
 
