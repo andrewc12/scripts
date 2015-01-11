@@ -1,7 +1,7 @@
 #!/bin/bash
 
 container=$1
-SUITE=wheezy MIRROR=http://aptcache:3142/ftp.debian.org/debian lxc-create -n $container -t debian
+SUITE="wheezy" MIRROR="http://aptcache:3142/ftp.debian.org/debian" lxc-create -n $container -t debian
 #SUITE=wheezy lxc-create -B loop  -n $container -t debian
 
 
