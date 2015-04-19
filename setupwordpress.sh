@@ -25,6 +25,9 @@
 # ????-??-??  Created
 # ---------------------------------------------------------------------------
 
+#TODO:
+#Change mysql commands so that they can be run from the command line.
+
 #Based on
 #http://theapotek.com/teknotes/2013/11/25/aws-ec2-debian-nginx-wordpress-varnish/
 
