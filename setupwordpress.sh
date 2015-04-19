@@ -186,13 +186,25 @@ chown -R www-data:www-data /var/www/example.org/public/
 mv /var/www/example.org/public/wp-config-sample.php /var/www/example.org/public/wp-config.php 
 
 #Change the table, username and password settings so that they match our actual database.
-nano /var/www/example.org/public/wp-config.php 
-/** The name of the database for WordPress */
-define('DB_NAME', 'wp_database_example_org');
-/** MySQL database username */
-define('DB_USER', 'example_org');
-/** MySQL database password */
-define('DB_PASSWORD', 'PasswordToChange'); 
+x="define('DB_NAME', 'database_name_here');"
+y="define('DB_NAME', 'myname');"
+sed  -i "s/$x/$y/g"   /var/www/example.org/public/wp-config.php
+
+x="define('DB_USER', 'username_here');"
+y="define('DB_USER', 'example_org');"
+sed  -i "s/$x/$y/g"   /var/www/example.org/public/wp-config.php
+
+x="define('DB_PASSWORD', 'password_here');"
+y="define('DB_PASSWORD', 'PasswordToChange');"
+sed  -i "s/$x/$y/g"   /var/www/example.org/public/wp-config.php
+
+#nano /var/www/example.org/public/wp-config.php 
+#/** The name of the database for WordPress */
+#define('DB_NAME', 'wp_database_example_org');
+#/** MySQL database username */
+#define('DB_USER', 'example_org');
+#/** MySQL database password */
+#define('DB_PASSWORD', 'PasswordToChange'); 
 
 #Wordpress is now ready to be installed.
 #Perform the wordpress configuration by going to.
