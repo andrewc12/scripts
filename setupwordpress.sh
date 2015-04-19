@@ -26,7 +26,6 @@
 # ---------------------------------------------------------------------------
 
 #TODO:
-#Change mysql commands so that they can be run from the command line.
 
 #Based on
 #http://theapotek.com/teknotes/2013/11/25/aws-ec2-debian-nginx-wordpress-varnish/
@@ -173,10 +172,11 @@ mv * /var/www/example.org/public/
 mysqladmin -u root -p create wp_database_example_org
 
 #Add the user.
-mysql -u root -p 
+mysql -u root -p
 #Run these commands.
-GRANT ALL PRIVILEGES ON wp_database_example_org.* TO 'example_org'@'localhost' IDENTIFIED BY 'PasswordToChange';
-GRANT ALL PRIVILEGES ON wp_database_example_org.* TO 'example_org'@'localhost.localdomain' IDENTIFIED BY 'PasswordToChange'; FLUSH PRIVILEGES; quit; 
+#GRANT ALL PRIVILEGES ON wp_database_example_org.* TO 'example_org'@'localhost' IDENTIFIED BY 'PasswordToChange';
+#GRANT ALL PRIVILEGES ON wp_database_example_org.* TO 'example_org'@'localhost.localdomain' IDENTIFIED BY 'PasswordToChange'; FLUSH PRIVILEGES; quit; 
+mysql -u root -p -e "GRANT ALL PRIVILEGES ON wp_database_example_org.* TO 'example_org'@'localhost' IDENTIFIED BY 'PasswordToChange'; GRANT ALL PRIVILEGES ON wp_database_example_org.* TO 'example_org'@'localhost.localdomain' IDENTIFIED BY 'PasswordToChange'; FLUSH PRIVILEGES; quit;"
 
 #Change the owner of the root of the virtual host so that the web server
 #can write to it.
