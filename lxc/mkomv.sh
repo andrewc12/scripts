@@ -54,7 +54,7 @@ mkdir $TARGET
 mount $ROOT $TARGET
 mkdir $TARGET/boot
 mount $BOOT $TARGET/boot
-
+cp ./mkomv.sh $TARGET/mkomv.sh
 cd $TARGET
 wget --no-check-certificate  https://www.dropbox.com/s/uav4oc6oibmo5mb/Debian-3.17.0-kirkwood-tld-1-rootfs-bodhi.tar.bz2?dl=1
 
@@ -65,7 +65,6 @@ mount -t sysfs sys sys/
 mount -o bind /dev dev/
 
 cp /etc/resolv.conf etc/resolv.conf
-cp /home/andrew/mkomv.sh mkomv.sh
 chmod +x mkomv.sh
 chroot ./ /mkomv.sh part2
 exit 0
