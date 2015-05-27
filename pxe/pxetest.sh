@@ -17,11 +17,11 @@ export PXELINUXMENU="$TFTPPATH/pxelinux.cfg/default"
 SYSLINUXPATH="/usr/lib/syslinux"
 DHCPSUBNET="10.0.0.0"
 DHCPNETMASK="255.255.255.0"
-DHCPLEASESTART="10.0.0.180"
-DHCPLEASESTOP="10.0.0.200"
+DHCPLEASESTART="10.0.0.10"
+DHCPLEASESTOP="10.0.0.20"
 #DHCPBROADCAST="10.0.0.255"
-DHCPROUTER="10.0.0.138"
-DHCPDNS="10.0.0.138"
+DHCPROUTER="10.0.0.3"
+DHCPDNS="10.0.0.3"
 
 #Enter the Mac address of the computers you want to boot
 #or comment out ignore unknown-clients; below
@@ -47,7 +47,7 @@ PXEMAC4="08:00:27:F4:1E:9C"
 CZPAEURL="http://downloads.sourceforge.net/project/clonezilla/clonezilla_live_stable/2.2.1-25/clonezilla-live-2.2.1-25-i686-pae.zip"
 
 INSTALLCLONEZILLA=0
-INSTALLPLOP=0
+INSTALLPLOP=1
 INSTALLDEBIANAMD64=1
 INSTALLDEBIANI386=0
 INSTALLDEBIANPRESEED=1
@@ -138,6 +138,8 @@ mkdir $TFTPPATH/images
 mkdir $TFTPPATH/pxelinux.cfg
 #Copy syslinux files
 apt-get install syslinux
+apt-get install syslinux-common pxelinux
+#wheezy
 cp $SYSLINUXPATH/pxelinux.0 $TFTPPATH/
 cp $SYSLINUXPATH/gpxelinux.0 $TFTPPATH/
 cp $SYSLINUXPATH/menu.c32 $TFTPPATH/
@@ -145,6 +147,16 @@ cp $SYSLINUXPATH/vesamenu.c32 $TFTPPATH/
 cp $SYSLINUXPATH/reboot.c32 $TFTPPATH/
 cp $SYSLINUXPATH/chain.c32 $TFTPPATH/
 cp $SYSLINUXPATH/memdisk $TFTPPATH/
+#jessie
+cp /usr/lib/PXELINUX/pxelinux.0 $TFTPPATH/
+cp /usr/lib/PXELINUX/gpxelinux.0 $TFTPPATH/
+cp /usr/lib/syslinux/modules/bios/menu.c32 $TFTPPATH/
+cp /usr/lib/syslinux/modules/bios/vesamenu.c32 $TFTPPATH/
+cp /usr/lib/syslinux/modules/bios/reboot.c32 $TFTPPATH/
+cp /usr/lib/syslinux/modules/bios/chain.c32 $TFTPPATH/
+cp /usr/lib/syslinux/modules/bios/ldlinux.c32 $TFTPPATH/
+cp /usr/lib/syslinux/modules/bios/libutil.c32 $TFTPPATH/
+cp /usr/lib/syslinux/memdisk $TFTPPATH/
 
 cat > $PXELINUXMENU << EOF
 ui menu.c32
