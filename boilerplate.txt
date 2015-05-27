@@ -1,0 +1,26 @@
+#!/bin/bash
+# ---------------------------------------------------------------------------
+# new_script - Bash shell script template generator
+
+# Copyright 2012, William Shotts <bshotts@users.sourceforge.net>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License at <http://www.gnu.org/licenses/> for
+# more details.
+
+# Usage: new_script [-h|--help] [-q|--quiet] [-s|--root] [script]
+
+# Revision history:
+# 2014-03-20  Corrected bug in insert_help_message() discovered by
+#             Lev Gorenstein <lev@ledorub.poxod.com> (3.3)
+# 2014-01-21  Minor formatting corrections (3.2)
+# 2014-01-12  Various cleanups (3.1)
+# 2012-05-14  Created
+# ---------------------------------------------------------------------------
