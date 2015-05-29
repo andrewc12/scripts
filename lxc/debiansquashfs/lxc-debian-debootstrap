@@ -1,4 +1,3 @@
-w
 #!/bin/bash
 
 #
@@ -53,13 +52,13 @@ openssh-server
     release=$2
     containerdir=$1
 
-    mkdir -p  $lxcdir/debianimg
+    mkdir -p  $containerdir/debianimg
 
     # download a mini debian into a cache
     echo "Downloading debian minimal ..."
     debootstrap --verbose --variant=minbase --arch=$arch \
         --include=$packages \
-        "$release" "$comtainerdir/debianimg" $MIRROR
-    mksquashfs  $containerdir/debianimg $containerdir/template.squashfs comp xz
+        "$release" "$containerdir/debianimg" $MIRROR
+    mksquashfs  $containerdir/debianimg $containerdir/template.squashfs -comp xz
     exit 0
 
