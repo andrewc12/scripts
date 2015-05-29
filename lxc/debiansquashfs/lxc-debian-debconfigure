@@ -1,0 +1,198 @@
+#!/bin/bash
+
+#
+# lxc: linux Container library
+
+# Authors:
+# Daniel Lezcano <daniel.lezcano@free.fr>
+
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+
+# Detect use under userns (unsupported)
+for arg in "$@"; do
+    [ "$arg" = "--" ] && break
+    if [ "$arg" = "--mapped-uid" -o "$arg" = "--mapped-gid" ]; then
+        echo "This template can't be used for unprivileged containers." 1>&2
+        echo "You may want to try the \"download\" template instead." 1>&2
+        exit 1
+    fi
+done
+
+# Make sure the usual locations are in PATH
+export PATH=$PATH:/usr/sbin:/usr/bin:/sbin:/bin
+
+MIRROR=${MIRROR:-http://http.debian.net/debian}
+LOCALSTATEDIR="/var"
+LXC_TEMPLATE_CONFIG="/usr/share/lxc/config"
+
+    rootfs=/root/tmp/rootfs #$1
+    hostname=test #$2
+
+    # squeeze only has /dev/tty and /dev/tty0 by default,
+    # therefore creating missing device nodes for tty1-4.
+    for tty in $(seq 1 4); do
+        if [ ! -e $rootfs/dev/tty$tty ]; then
+            mknod $rootfs/dev/tty$tty c 4 $tty
+        fi
+    done
+
+    # configure the inittab
+    cat <<EOF > $rootfs/etc/inittab
+id:3:initdefault:
+si::sysinit:/etc/init.d/rcS
+l0:0:wait:/etc/init.d/rc 0
+l1:1:wait:/etc/init.d/rc 1
+l2:2:wait:/etc/init.d/rc 2
+l3:3:wait:/etc/init.d/rc 3
+l4:4:wait:/etc/init.d/rc 4
+l5:5:wait:/etc/init.d/rc 5
+l6:6:wait:/etc/init.d/rc 6
+# Normally not reached, but fallthrough in case of emergency.
+z6:6:respawn:/sbin/sulogin
+1:2345:respawn:/sbin/getty 38400 console
+c1:12345:respawn:/sbin/getty 38400 tty1 linux
+c2:12345:respawn:/sbin/getty 38400 tty2 linux
+c3:12345:respawn:/sbin/getty 38400 tty3 linux
+c4:12345:respawn:/sbin/getty 38400 tty4 linux
+p6::ctrlaltdel:/sbin/init 6
+p0::powerfail:/sbin/init 0
+EOF
+
+    # symlink mtab
+    [ -e "$rootfs/etc/mtab" ] && rm $rootfs/etc/mtab
+    ln -s /proc/self/mounts $rootfs/etc/mtab
+
+    # disable selinux in debian
+    mkdir -p $rootfs/selinux
+    echo 0 > $rootfs/selinux/enforce
+
+    # configure the network using the dhcp
+    cat <<EOF > $rootfs/etc/network/interfaces
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet dhcp
+EOF
+
+    # set the hostname
+    cat <<EOF > $rootfs/etc/hostname
+$hostname
+EOF
+
+    # reconfigure some services
+    if [ -z "$LANG" ]; then
+        chroot $rootfs locale-gen en_US.UTF-8 UTF-8
+        chroot $rootfs update-locale LANG=en_US.UTF-8
+    else
+        encoding=$(echo $LANG | cut -d. -f2)
+        chroot $rootfs sed -e "s/^# \(${LANG} ${encoding}\)/\1/" \
+            -i /etc/locale.gen 2> /dev/null
+        chroot $rootfs locale-gen $LANG $encoding
+        chroot $rootfs update-locale LANG=$LANG
+    fi
+
+    # remove pointless services in a container
+    chroot $rootfs /usr/sbin/update-rc.d -f checkroot.sh disable
+    chroot $rootfs /usr/sbin/update-rc.d -f umountfs disable
+    chroot $rootfs /usr/sbin/update-rc.d -f hwclock.sh disable
+    chroot $rootfs /usr/sbin/update-rc.d -f hwclockfirst.sh disable
+
+    # generate new SSH keys
+    if [ -x $rootfs/var/lib/dpkg/info/openssh-server.postinst ]; then
+        cat > $rootfs/usr/sbin/policy-rc.d << EOF
+#!/bin/sh
+exit 101
+EOF
+        chmod +x $rootfs/usr/sbin/policy-rc.d
+
+        if [ -f $rootfs/etc/init/ssh.conf ]; then
+            mv $rootfs/etc/init/ssh.conf $rootfs/etc/init/ssh.conf.disabled
+        fi
+
+        rm -f $rootfs/etc/ssh/ssh_host_*key*
+
+        DPKG_MAINTSCRIPT_PACKAGE=openssh DPKG_MAINTSCRIPT_NAME=postinst chroot $rootfs /var/lib/dpkg/info/openssh-server.postinst configure
+        sed -i "s/root@$(hostname)/root@$hostname/g" $rootfs/etc/ssh/ssh_host_*.pub
+
+	# Don't allow root login with password
+	sed -i "s/PermitRootLogin yes/PermitRootLogin without-password/" $rootfs/etc/ssh/sshd_config
+
+        if [ -f "$rootfs/etc/init/ssh.conf.disabled" ]; then
+            mv $rootfs/etc/init/ssh.conf.disabled $rootfs/etc/init/ssh.conf
+        fi
+
+        rm -f $rootfs/usr/sbin/policy-rc.d
+    fi
+
+    # set initial timezone as on host
+    if [ -f /etc/timezone ]; then
+        cat /etc/timezone > $rootfs/etc/timezone
+        chroot $rootfs dpkg-reconfigure -f noninteractive tzdata
+    elif [ -f /etc/sysconfig/clock ]; then
+        . /etc/sysconfig/clock
+        echo $ZONE > $rootfs/etc/timezone
+        chroot $rootfs dpkg-reconfigure -f noninteractive tzdata
+    else
+        echo "Timezone in container is not configured. Adjust it manually."
+    fi
+
+    password="$(dd if=/dev/urandom bs=6 count=1 2> /dev/null | base64)"
+
+    echo "root:$password" | chroot $rootfs chpasswd
+    echo "Root password is '$password', please change !"
+
+
+
+
+
+
+
+    path=$1
+    rootfs=$2
+
+    init="$(chroot ${rootfs} dpkg-query --search /sbin/init | cut -d : -f 1)"
+    if [ "$init" = "systemd-sysv" ]; then
+       # only appropiate when systemd is PID 1
+       echo 'lxc.autodev = 1' >> "$path/config"
+       echo 'lxc.kmsg = 0' >> "$path/config"
+    fi
+
+    # this only works if we have getty@.service to manipulate
+    if [ -f ${rootfs}/lib/systemd/system/getty\@.service ]; then
+       sed -e 's/^ConditionPathExists=/# ConditionPathExists=/' \
+           -e 's/After=dev-%i.device/After=/' \
+           < ${rootfs}/lib/systemd/system/getty\@.service \
+           > ${rootfs}/etc/systemd/system/getty\@.service
+    fi
+
+    # just in case systemd is not installed
+    mkdir -p ${rootfs}/{lib,etc}/systemd/system
+    mkdir -p ${rootfs}/etc/systemd/system/getty.target.wants
+
+    # This function has been copied and adapted from lxc-fedora
+    rm -f ${rootfs}/etc/systemd/system/default.target
+    touch ${rootfs}/etc/fstab
+    chroot ${rootfs} ln -s /dev/null /etc/systemd/system/systemd-udevd.service
+    chroot ${rootfs} ln -s /lib/systemd/system/multi-user.target /etc/systemd/system/default.target
+    # Make systemd honor SIGPWR
+    chroot ${rootfs} ln -s /lib/systemd/system/halt.target /etc/systemd/system/sigpwr.target
+    # Setup getty service on the 4 ttys we are going to allow in the
+    # default config.  Number should match lxc.tty
+    ( cd ${rootfs}/etc/systemd/system/getty.target.wants
+        for i in 1 2 3 4 ; do ln -sf ../getty\@.service getty@tty${i}.service; done )
+
+    return 0
+
