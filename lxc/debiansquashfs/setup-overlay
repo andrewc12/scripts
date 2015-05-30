@@ -1,0 +1,13 @@
+#!/bin/bash
+
+containerdir=$1
+rootfs=$2
+
+mkdir $containerdir/upper $containerdir/template $containerdir/work $rootfs
+mount -o ro "$containerdir/template.squashfs" "$containerdir/template"
+#cd $LXC_DIR
+modprobe overlay
+mount -t overlay overlay -olowerdir=$containerdir/template,upperdir=$containerdir/upper,workdir=$containerdir/work $rootfs
+
+ 
+ 
