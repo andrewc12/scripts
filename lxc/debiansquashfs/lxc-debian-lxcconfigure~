@@ -37,10 +37,10 @@ MIRROR=${MIRROR:-http://http.debian.net/debian}
 LOCALSTATEDIR="/var"
 LXC_TEMPLATE_CONFIG="/usr/share/lxc/config"
 
-    path=$1
-    rootfs=$2
-    hostname=$3
-    arch=$4
+    path=/var/lib/lxc/test #$1
+    rootfs=/var/lib/lxc/test/rootfs #$2
+    hostname=test #$3
+    arch=armel #$4
 
     # Generate the configuration file
     ## Create the fstab (empty by default)

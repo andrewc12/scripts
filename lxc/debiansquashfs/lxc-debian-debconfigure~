@@ -37,8 +37,8 @@ MIRROR=${MIRROR:-http://http.debian.net/debian}
 LOCALSTATEDIR="/var"
 LXC_TEMPLATE_CONFIG="/usr/share/lxc/config"
 
-    rootfs=$1
-    hostname=$2
+    rootfs=/root/tmp/rootfs #$1
+    hostname=test #$2
 
     # squeeze only has /dev/tty and /dev/tty0 by default,
     # therefore creating missing device nodes for tty1-4.
