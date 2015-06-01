@@ -1,0 +1,15 @@
+#!/bin/bash
+name=delta
+i=0
+if [[ -e $name$i.squashfs ]] ; then
+    while [[ -e $name$i.squashfs ]] ; do
+        echo $name$i.squashfs
+
+        let i++
+    done
+    name=$name$i
+fi
+echo $name.squashfs
+
+mksquashfs upper $name.squashfs
+rm -r upper/*

@@ -1,0 +1,42 @@
+#!/bin/bash
+LXC_DIR=$(dirname "$LXC_ROOTFS_PATH")
+echo "start" >> $LXC_DIR/log
+mkdir $LXC_DIR/upper $LXC_DIR/template $LXC_DIR/work
+mount -o ro "$LXC_DIR/template.squashfs" "$LXC_DIR/template"
+
+lowerdir="template"
+
+
+name=delta
+i=0
+if [[ -e "$LXC_DIR/$name$i.squashfs" ]] ; then
+    while [[ -e "$LXC_DIR/$name$i.squashfs" ]] ; do
+
+echo "start loop" >> $LXC_DIR/log
+echo "$LXC_DIR" >> $LXC_DIR/log
+echo $filename >> $LXC_DIR/log
+
+dirname=$name$i
+shortname=$name$i.squashfs
+
+echo $dirname >> $LXC_DIR/log
+echo $shortname >> $LXC_DIR/log
+
+mkdir "$LXC_DIR/$dirname"
+mount -o ro "$LXC_DIR/$shortname" "$LXC_DIR/$dirname"
+lowerdir="$dirname:$lowerdir"
+echo $lowerdir >> $LXC_DIR/log
+
+
+        let i++
+    done
+#    name=$name$i
+fi
+
+
+echo $lowerdir >> $LXC_DIR/log
+modprobe overlay
+cd $LXC_DIR
+#mount -t overlay overlay -olowerdir=delta0:template,upperdir=upper,workdir=work rootfs
+mount -t overlay overlay -olowerdir=$lowerdir,upperdir=upper,workdir=work rootfs
+
