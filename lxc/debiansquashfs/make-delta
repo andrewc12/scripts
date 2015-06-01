@@ -7,8 +7,8 @@ if [[ -e $name$i.squashfs ]] ; then
 
         let i++
     done
-    name=$name$i
 fi
+name=$name$i
 echo $name.squashfs
 
 mksquashfs upper $name.squashfs
