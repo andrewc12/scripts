@@ -22,14 +22,17 @@ echo "lxc.hook.pre-mount = /var/lib/lxc/$container/mount-overlay" >> /var/lib/lx
 
 
 
-cat >> /var/lib/lxc/$container/mount-overlay << "EOF"
-#!/bin/sh
-LXC_DIR=$(dirname "$LXC_ROOTFS_PATH")
-mkdir $LXC_DIR/upper $LXC_DIR/template $LXC_DIR/work
-mount -o ro "$LXC_DIR/template.squashfs" "$LXC_DIR/template"
-modprobe overlay
-cd $LXC_DIR
-mount -t overlay overlay -olowerdir=template,upperdir=upper,workdir=work rootfs
-EOF
+#cat >> /var/lib/lxc/$container/mount-overlay << "EOF"
+##!/bin/sh
+#LXC_DIR=$(dirname "$LXC_ROOTFS_PATH")
+#mkdir $LXC_DIR/upper $LXC_DIR/template $LXC_DIR/work
+#mount -o ro "$LXC_DIR/template.squashfs" "$LXC_DIR/template"
+#modprobe overlay
+#cd $LXC_DIR
+#mount -t overlay overlay -olowerdir=template,upperdir=upper,workdir=work rootfs
+#EOF
 
+cp ./make-delta /var/lib/lxc/$container/make-delta
+cp ./mount-overlay /var/lib/lxc/$container/mount-overlay
+chmod a+x /var/lib/lxc/$container/make-delta
 chmod a+x /var/lib/lxc/$container/mount-overlay
