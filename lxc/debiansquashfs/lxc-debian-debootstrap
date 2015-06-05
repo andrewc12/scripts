@@ -56,6 +56,9 @@ openssh-server
 
     # download a mini debian into a cache
     echo "Downloading debian minimal ..."
+    #debootstrap --verbose --arch=$arch \
+    #    --include=$packages,build-essential,lxc,bridge-utils,nano,vim,netcat6,python3,squashfs-tools \
+    #    "$release" "$containerdir/debianimg" $MIRROR
     debootstrap --verbose --variant=minbase --arch=$arch \
         --include=$packages \
         "$release" "$containerdir/debianimg" $MIRROR
