@@ -37,7 +37,7 @@ MIRROR=${MIRROR:-http://http.debian.net/debian}
 LOCALSTATEDIR="/var"
 LXC_TEMPLATE_CONFIG="/usr/share/lxc/config"
 
-packages=\
+basepackages=\
 ifupdown,\
 locales,\
 libui-dialog-perl,\
@@ -51,6 +51,15 @@ openssh-server
     arch=$3
     release=$2
     containerdir=$1
+    packages=$4
+
+if [ packages ]
+    then
+	packages="$basepackages,$packages"
+	echo $packages
+    else
+	packages="$basepackages"
+fi
 
     mkdir -p  $containerdir/debianimg
 
