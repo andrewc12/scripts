@@ -56,7 +56,7 @@ newclientovpn () {
 	echo "</key>" >> ~/$1.ovpn
 }
 newclient () {
-	# Generates the client.ovpn
+	# Generates the client.tar
 	cp /usr/share/doc/openvpn*/*ample*/sample-config-files/client.conf ~/$1.conf
 	sed -i "s/cert client.crt/cert $1.crt/" ~/$1.conf
 	sed -i "s/key client.key/key $1.key/" ~/$1.conf
@@ -89,8 +89,8 @@ if [[ -e /etc/openvpn/server.conf ]]; then
 		echo "Looks like OpenVPN is already installed"
 		echo "What do you want to do?"
 		echo ""
-		echo "1) Add a cert for a new user (ovpn)"
-		echo "2) Add a cert for a new user"
+		echo "1) Add a cert for a new user"
+		echo "2) Add a cert for a new user (ovpn)"
 		echo "3) Revoke existing user cert"
 		echo "4) Remove OpenVPN"
 		echo "5) Exit"
@@ -166,7 +166,7 @@ if [[ -e /etc/openvpn/server.conf ]]; then
 			fi
 			exit
 			;;
-			4) exit;;
+			5) exit;;
 		esac
 	done
 else
@@ -296,3 +296,4 @@ else
 	echo "Your client config is available at ~/$CLIENT.ovpn"
 	echo "If you want to add more clients, you simply need to run this script another time!"
 fi
+
