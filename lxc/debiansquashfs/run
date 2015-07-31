@@ -1,0 +1,10 @@
+#!/bin/bash
+scriptdir=$(dirname $0)
+echo $scriptdir
+name="testlemp2"
+./lxc-debian-debootstrap "/var/lib/lxc/$name" jessie armel lxc,vim,nano,mysql-server,mysql-client,nginx,php5-fpm,php5-mysql 
+./setup-overlay "/var/lib/lxc/$name" "/var/lib/lxc/$name/rootfs"
+./lxc-debian-debconfigure "/var/lib/lxc/$name/rootfs" $name "/var/lib/lxc/$name"
+./lxc-debian-lxcconfigure "/var/lib/lxc/$name" "/var/lib/lxc/$name/rootfs" $name armel
+./lxc-debian-lxccustomise $name
+./passwd $name
