@@ -38,7 +38,7 @@ else
 	exit
 fi
 
-newclient () {
+newclientovpn () {
 	# Generates the client.ovpn
 	cp /usr/share/doc/openvpn*/*ample*/sample-config-files/client.conf ~/$1.ovpn
 	sed -i "/ca ca.crt/d" ~/$1.ovpn
@@ -53,6 +53,13 @@ newclient () {
 	echo "<key>" >> ~/$1.ovpn
 	cat /etc/openvpn/easy-rsa/2.0/keys/$1.key >> ~/$1.ovpn
 	echo "</key>" >> ~/$1.ovpn
+}
+newclient () {
+	# Generates the client.ovpn
+	cp /usr/share/doc/openvpn*/*ample*/sample-config-files/client.conf ~/$1.conf
+	sed -i "s/cert client.crt/cert $1.crt/" ~/$1.conf
+	sed -i "s/key client.key/key $1.key/" ~/$1.conf
+	tar -cvf ~/$1.tar ~/$1.conf /etc/openvpn/easy-rsa/2.0/keys/ca.crt /etc/openvpn/easy-rsa/2.0/keys/$1.crt /etc/openvpn/easy-rsa/2.0/keys/$1.key
 }
 
 geteasyrsa () {
@@ -81,12 +88,13 @@ if [[ -e /etc/openvpn/server.conf ]]; then
 		echo "Looks like OpenVPN is already installed"
 		echo "What do you want to do?"
 		echo ""
-		echo "1) Add a cert for a new user"
-		echo "2) Revoke existing user cert"
-		echo "3) Remove OpenVPN"
-		echo "4) Exit"
+		echo "1) Add a cert for a new user (ovpn)"
+		echo "2) Add a cert for a new user"
+		echo "3) Revoke existing user cert"
+		echo "4) Remove OpenVPN"
+		echo "5) Exit"
 		echo ""
-		read -p "Select an option [1-4]: " option
+		read -p "Select an option [1-5]: " option
 		case $option in
 			1) 
 			echo ""
@@ -99,13 +107,30 @@ if [[ -e /etc/openvpn/server.conf ]]; then
 			export KEY_CN="$CLIENT"
 			export EASY_RSA="${EASY_RSA:-.}"
 			"$EASY_RSA/pkitool" $CLIENT
-			# Generate the client.ovpn
+			# Generate the client.tar
 			newclient "$CLIENT"
+			echo ""
+			echo "Client $CLIENT added, certs available at ~/$CLIENT.tar"
+			exit
+			;;
+			2) 
+			echo ""
+			echo "Tell me a name for the client cert"
+			echo "Please, use one word only, no special characters"
+			read -p "Client name: " -e -i client CLIENT
+			cd /etc/openvpn/easy-rsa/2.0/
+			source ./vars
+			# build-key for the client
+			export KEY_CN="$CLIENT"
+			export EASY_RSA="${EASY_RSA:-.}"
+			"$EASY_RSA/pkitool" $CLIENT
+			# Generate the client.ovpn
+			newclientovpn "$CLIENT"
 			echo ""
 			echo "Client $CLIENT added, certs available at ~/$CLIENT.ovpn"
 			exit
 			;;
-			2)
+			3)
 			echo ""
 			echo "Tell me the existing client name"
 			read -p "Client name: " -e -i client CLIENT
@@ -121,7 +146,7 @@ if [[ -e /etc/openvpn/server.conf ]]; then
 			echo "Certificate for client $CLIENT revoked"
 			exit
 			;;
-			3) 
+			4) 
 			echo ""
 			read -p "Do you really want to remove OpenVPN? [y/n]: " -e -i n REMOVE
 			if [[ "$REMOVE" = 'y' ]]; then
