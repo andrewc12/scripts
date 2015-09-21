@@ -1,0 +1,43 @@
+     lxc-create 1427689003.151 ERROR    bdev - Invalid argument - Error seeking to set new loop file size
+     lxc-create 1427689003.157 ERROR    lxc_container - Failed to create backing store type loop
+     lxc-create 1427689003.158 ERROR    lxc_container - Error creating backing store type loop for sudolooptest2
+     lxc-create 1427689003.244 ERROR    lxc_create_ui - Error creating container sudolooptest2
+     lxc-create 1427689316.264 ERROR    bdev - Error creating filesystem type ext4 on /var/lib/lxc/sudolooptest2/rootdev
+     lxc-create 1427689316.270 ERROR    lxc_container - Failed to create backing store type loop
+     lxc-create 1427689316.271 ERROR    lxc_container - Error creating backing store type loop for sudolooptest2
+     lxc-create 1427689316.525 ERROR    lxc_create_ui - Error creating container sudolooptest2
+     lxc-create 1427689385.481 ERROR    lxc_container - container creation template for sudolooptest2 failed
+     lxc-create 1427689386.085 ERROR    lxc_create_ui - Error creating container sudolooptest2
+     lxc-create 1427689422.755 ERROR    bdev - Error creating filesystem type ext4 on /var/lib/lxc/sudolooptest2/rootdev
+     lxc-create 1427689422.760 ERROR    lxc_container - Failed to create backing store type loop
+     lxc-create 1427689422.761 ERROR    lxc_container - Error creating backing store type loop for sudolooptest2
+     lxc-create 1427689422.937 ERROR    lxc_create_ui - Error creating container sudolooptest2
+     lxc-create 1427689438.877 ERROR    bdev - Error creating filesystem type ext4 on /var/lib/lxc/sudolooptest2/rootdev
+     lxc-create 1427689438.882 ERROR    lxc_container - Failed to create backing store type loop
+     lxc-create 1427689438.883 ERROR    lxc_container - Error creating backing store type loop for sudolooptest2
+     lxc-create 1427689439.116 ERROR    lxc_create_ui - Error creating container sudolooptest2
+     lxc-create 1427689489.139 ERROR    bdev - Error creating filesystem type ext4 on /var/lib/lxc/sudolooptest2/rootdev
+     lxc-create 1427689489.143 ERROR    lxc_container - Failed to create backing store type loop
+     lxc-create 1427689489.145 ERROR    lxc_container - Error creating backing store type loop for sudolooptest2
+     lxc-create 1427689489.227 ERROR    lxc_create_ui - Error creating container sudolooptest2
+     lxc-create 1427689536.659 ERROR    bdev - Error creating filesystem type ext4 on /var/lib/lxc/sudolooptest2/rootdev
+     lxc-create 1427689536.664 ERROR    lxc_container - Failed to create backing store type loop
+     lxc-create 1427689536.666 ERROR    lxc_container - Error creating backing store type loop for sudolooptest2
+     lxc-create 1427689536.816 ERROR    lxc_create_ui - Error creating container sudolooptest2
+     lxc-create 1427689612.353 ERROR    lxc_container - container creation template for sudolooptest2 failed
+     lxc-create 1427689612.820 ERROR    lxc_create_ui - Error creating container sudolooptest2
+     lxc-create 1427689667.889 ERROR    bdev - Error creating filesystem type ext4 on /var/lib/lxc/sudolooptest2/rootdev
+     lxc-create 1427689667.894 ERROR    lxc_container - Failed to create backing store type loop
+     lxc-create 1427689667.895 ERROR    lxc_container - Error creating backing store type loop for sudolooptest2
+     lxc-create 1427689668.182 ERROR    lxc_create_ui - Error creating container sudolooptest2
+     lxc-create 1427689682.069 ERROR    bdev - Error creating filesystem type ext4 on /var/lib/lxc/sudolooptest2/rootdev
+     lxc-create 1427689682.073 ERROR    lxc_container - Failed to create backing store type loop
+     lxc-create 1427689682.075 ERROR    lxc_container - Error creating backing store type loop for sudolooptest2
+     lxc-create 1427689682.225 ERROR    lxc_create_ui - Error creating container sudolooptest2
+     lxc-create 1427692137.351 ERROR    lxc_container - Error: sudolooptest2 creation was not completed
+     lxc-create 1427692137.359 ERROR    lxc_container - File exists - Erorr creating partial file
+     lxc-create 1427692137.361 ERROR    lxc_create_ui - Error creating container sudolooptest2
+     lxc-create 1427693802.096 ERROR    bdev - No loop device found
+     lxc-create 1427693802.099 ERROR    lxc_container - Error mounting rootfs
+     lxc-create 1427693802.877 ERROR    lxc_container - container creation template for sudolooptest failed
+     lxc-create 1427693803.070 ERROR    lxc_create_ui - Error creating container sudolooptest
