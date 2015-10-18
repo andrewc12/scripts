@@ -6,6 +6,8 @@
 #                "${array[@]}", "$(command)". Use 'single quotes' to make something literal, eg. 'Costs $5 USD'. See
 #                <http://mywiki.wooledge.org/Quotes>, <http://mywiki.wooledge.org/Arguments> and
 #                <http://wiki.bash-hackers.org/syntax/words>.
+LINES=$(tput lines)
+COLUMNS=$(tput cols)
 
 export PXEIP=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1 -d'/')
 DHCPBROADCAST=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $4}')
@@ -95,8 +97,42 @@ MENU LABEL Install debian ${DEBARCH} preseed
 	append vga=normal initrd=debian-installer/${DEBARCH}/initrd.gz auto=true interface=auto netcfg/dhcp_timeout=60 netcfg/choose_interface=auto priority=critical preseed/url=tftp://$PXEIP/debian-installer/preseed.cfg DEBCONF_DEBUG=5
 EOF
 }
-
+installserver(){
 apt-get install isc-dhcp-server tftpd-hpa
+}
+
+
+####################MENU####################
+while true; do
+CHOICE=$(whiptail --title "PXE Setup Menu" --menu "Choose an option" $LINES $COLUMNS $(( $LINES - 8 )) \
+"<-- Back" "Return to the main menu." \
+"Add User" "Add a user to the system." \
+"Modify User" "Modify an existing user." \
+"List Users" "List all users on the system." \
+"Add Group" "Add a user group to the system." \
+"Modify Group" "Modify a group and its list of members." \
+"List Groups" "List all groups on the system." 3>&1 1>&2 2>&3)
+                                                                        # A trick to swap stdout and stderr.
+# Again, you can pack this inside if, but it seems really long for some 80-col terminal users.
+exitstatus=$?
+if [ $exitstatus = 1 ]; then
+    echo "User selected Cancel."
+    exit 0
+elif [ $exitstatus = 0 ]; then
+    echo "User selected " $CHOICE
+else
+#    echo "User selected Cancel."
+    exit 1
+fi
+
+echo "(Exit status was $exitstatus)"
+done
+
+
+
+
+
+
 
 cat > $DHCPDCONF << EOF
 
