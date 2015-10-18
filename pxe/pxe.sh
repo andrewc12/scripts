@@ -101,7 +101,7 @@ installserver(){
 apt-get install isc-dhcp-server tftpd-hpa
 apt-get install syslinux
 apt-get install syslinux-common pxelinux
-do_copy_syslinux
+#do_copy_syslinux
 }
 
 
@@ -132,44 +132,9 @@ cp /usr/lib/syslinux/modules/bios/chain.c32 $TFTPPATH/
 cp /usr/lib/syslinux/modules/bios/ldlinux.c32 $TFTPPATH/
 cp /usr/lib/syslinux/modules/bios/libutil.c32 $TFTPPATH/
 cp /usr/lib/syslinux/memdisk $TFTPPATH/
-)
+}
 
-####################MENU####################
-while true; do
-CHOICE=$(whiptail --title "PXE Setup Menu" --menu "Choose an option" $LINES $COLUMNS $(( $LINES - 8 )) \
-"1 Install" "Install the required debian packages." \
-"Add User" "Add a user to the system." \
-"Modify User" "Modify an existing user." \
-"List Users" "List all users on the system." \
-"Add Group" "Add a user group to the system." \
-"Modify Group" "Modify a group and its list of members." \
-"List Groups" "List all groups on the system." 3>&1 1>&2 2>&3)
-                                                                        # A trick to swap stdout and stderr.
-# Again, you can pack this inside if, but it seems really long for some 80-col terminal users.
-exitstatus=$?
-if [ $exitstatus = 1 ]; then
-    echo "User selected Cancel."
-    exit 0
-elif [ $exitstatus = 0 ]; then
-    echo "User selected " $CHOICE
-     case "$CHOICE" in
-      1\ *) installserver ;;
-      2\ *) installserver
-     esac
-else
-#    echo "User selected Cancel."
-    exit 1
-fi
-
-echo "(Exit status was $exitstatus)"
-done
-
-
-
-
-
-
-
+do_setup_server(){
 cat > $DHCPDCONF << EOF
 
 default-lease-time 600;
@@ -202,6 +167,46 @@ host 4 { hardware ethernet $PXEMAC4; }
 
 EOF
 /etc/init.d/isc-dhcp-server restart
+}
+
+####################MENU####################
+while true; do
+CHOICE=$(whiptail --title "PXE Setup Menu" --menu "Choose an option" $LINES $COLUMNS $(( $LINES - 8 )) \
+"1 Install" "Install the required debian packages." \
+"Add User" "Add a user to the system." \
+"Modify User" "Modify an existing user." \
+"List Users" "List all users on the system." \
+"Add Group" "Add a user group to the system." \
+"Modify Group" "Modify a group and its list of members." \
+"List Groups" "List all groups on the system." 3>&1 1>&2 2>&3)
+                                                                        # A trick to swap stdout and stderr.
+# Again, you can pack this inside if, but it seems really long for some 80-col terminal users.
+exitstatus=$?
+if [ $exitstatus = 1 ]; then
+    echo "User selected Cancel."
+    exit 0
+elif [ $exitstatus = 0 ]; then
+    echo "User selected " $CHOICE
+     case "$CHOICE" in
+      1\ *) installserver ;;
+      2\ *) installserver
+      #Configure servers
+#Install/download software
+#Generate menus
+     esac
+else
+#    echo "User selected Cancel."
+    exit 1
+fi
+
+echo "(Exit status was $exitstatus)"
+done
+
+
+
+
+
+
 
 
 
