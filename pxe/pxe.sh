@@ -94,6 +94,99 @@ EOF
 }
 
 installdebianpreseed(){
+cat > $TFTPPATH/debian-installer/preseed.cfg << EOF
+d-i debian-installer/language string en
+d-i debian-installer/country string US
+d-i debian-installer/locale string en_US
+d-i console-keymaps-at/keymap select us
+d-i keyboard-configuration/xkb-keymap select us
+
+d-i netcfg/get_hostname string unassigned-hostname
+d-i netcfg/get_domain string unassigned-domain
+
+
+# Package mirror
+d-i mirror/protocol string http
+d-i mirror/country string manual
+d-i mirror/http/hostname string ftp.iinet.net.au
+d-i mirror/http/directory string /debian/debian
+d-i mirror/suite string jessie
+ 
+
+d-i passwd/root-login boolean true
+d-i passwd/make-user boolean false
+d-i passwd/root-password password r00tme
+d-i passwd/root-password-again password r00tme
+
+tasksel tasksel/first multiselect standard
+d-i pkgsel/include string openssh-server
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+d-i partman-auto/disk string /dev/sda
+d-i partman-auto/method string lvm
+
+d-i partman-lvm/device_remove_lvm boolean true
+d-i partman-md/device_remove_md boolean true
+d-i partman-lvm/confirm boolean true
+d-i partman-lvm/confirm_nooverwrite boolean true
+
+d-i partman-auto-lvm/guided_size string max
+
+d-i partman-auto/choose_recipe select atomic
+
+
+
+d-i partman-md/confirm boolean true
+d-i partman-partitioning/confirm_write_new_label boolean true
+d-i partman/choose_partition select finish
+d-i partman/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
+
+#d-i partman/mount_style select uuid
+
+
+
+
+
+
+
+
+
+d-i grub-installer/only_debian boolean true
+d-i grub-installer/with_other_os boolean true
+popularity-contest popularity-contest/participate boolean false
+d-i finish-install/reboot_in_progress note
+
+
+
+d-i preseed/late_command string chroot /target sh -c "mkdir -pm 700 /root/.ssh && echo 'ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAIEAhP5VvOuGObKch4q8H8CTIbZswuaaysvHxjZ0JBI2AIfbpPbGIPlKE5jKtNxoSITQdR6PNXu8UgoAdL1828QwcDCwsfjNg0G1Wv2+i/b6Kpd8M3DN9HyKk5C+2nXzfNw2ow5YfuN5GlbNEB7C6WYrQQsATqILB+45oDuZhjV43GE= postinstall key' > /root/.ssh/authorized_keys && chmod 0600 /root/.ssh/authorized_keys && chown -R root:root /root/.ssh"
+EOF
+
     cat >> $PXELINUXMENU << EOF
 LABEL preseedDI${DEBARCH}
 MENU LABEL Install debian ${DEBARCH} preseed
