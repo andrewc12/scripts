@@ -70,6 +70,10 @@ INSTALLDEBIANPRESEED=1
 #cd $some_directory || error_exit "$LINENO: Cannot change directory! Aborting"
 #rm *
 
+#do_check_dependencies(){
+#whiptail, wget, unzip
+#}
+
 installdebian(){
     mkdir /tmp/di${DEBARCH}
     cd /tmp/di${DEBARCH}
@@ -134,7 +138,7 @@ cp /usr/lib/syslinux/modules/bios/libutil.c32 $TFTPPATH/
 cp /usr/lib/syslinux/memdisk $TFTPPATH/
 }
 
-do_setup_server(){
+do_configure_server(){
 cat > $DHCPDCONF << EOF
 
 default-lease-time 600;
@@ -169,46 +173,11 @@ EOF
 /etc/init.d/isc-dhcp-server restart
 }
 
-####################MENU####################
-while true; do
-CHOICE=$(whiptail --title "PXE Setup Menu" --menu "Choose an option" $LINES $COLUMNS $(( $LINES - 8 )) \
-"1 Install" "Install the required debian packages." \
-"Add User" "Add a user to the system." \
-"Modify User" "Modify an existing user." \
-"List Users" "List all users on the system." \
-"Add Group" "Add a user group to the system." \
-"Modify Group" "Modify a group and its list of members." \
-"List Groups" "List all groups on the system." 3>&1 1>&2 2>&3)
-                                                                        # A trick to swap stdout and stderr.
-# Again, you can pack this inside if, but it seems really long for some 80-col terminal users.
-exitstatus=$?
-if [ $exitstatus = 1 ]; then
-    echo "User selected Cancel."
-    exit 0
-elif [ $exitstatus = 0 ]; then
-    echo "User selected " $CHOICE
-     case "$CHOICE" in
-      1\ *) installserver ;;
-      2\ *) installserver
-      #Configure servers
-#Install/download software
-#Generate menus
-     esac
-else
-#    echo "User selected Cancel."
-    exit 1
-fi
-
-echo "(Exit status was $exitstatus)"
-done
 
 
+do_install_payload(){
 
-
-
-
-
-
+do_copy_syslinux
 
 cat > $PXELINUXMENU << EOF
 ui menu.c32
@@ -285,6 +254,48 @@ then
     fi
 fi
 ##############################################################################################################
+sleep 10
+}
+
+
+####################MENU####################
+while true; do
+CHOICE=$(whiptail --title "PXE Setup Menu" --menu "Choose an option" $LINES $COLUMNS $(( $LINES - 8 )) \
+"1 Install" "Install the required debian packages." \
+"2 Configure" "Configure the services." \
+"3 Payloads" "Download and install the network payloads." \
+"List Users" "List all users on the system." \
+"Add Group" "Add a user group to the system." \
+"Modify Group" "Modify a group and its list of members." \
+"List Groups" "List all groups on the system." 3>&1 1>&2 2>&3)
+                                                                        # A trick to swap stdout and stderr.
+# Again, you can pack this inside if, but it seems really long for some 80-col terminal users.
+exitstatus=$?
+if [ $exitstatus = 1 ]; then
+    echo "User selected Cancel."
+    exit 0
+elif [ $exitstatus = 0 ]; then
+    echo "User selected " $CHOICE
+     case "$CHOICE" in
+      1\ *) installserver ;;
+      2\ *) do_configure_server ;;
+      #Configure server
+      3\ *) do_install_payload
+      #Install/download software and Generate menus
+     esac
+else
+#    echo "User selected Cancel."
+    exit 1
+fi
+
+echo "(Exit status was $exitstatus)"
+done
+
+
+
+
+
+
 
 
 
