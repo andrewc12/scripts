@@ -281,3 +281,38 @@ fi
 
 
 /etc/init.d/tftpd-hpa restart
+
+
+
+
+
+
+
+#https://en.wikibooks.org/wiki/Bash_Shell_Scripting/Whiptail
+
+LINES=$(tput lines)
+COLUMNS=$(tput cols)
+
+CHOICE=$(whiptail --title "Menu example" --menu "Choose an option" $LINES $COLUMNS $(( $LINES - 8 )) \
+"<-- Back" "Return to the main menu." \
+"Add User" "Add a user to the system." \
+"Modify User" "Modify an existing user." \
+"List Users" "List all users on the system." \
+"Add Group" "Add a user group to the system." \
+"Modify Group" "Modify a group and its list of members." \
+"List Groups" "List all groups on the system." 3>&1 1>&2 2>&3)
+                                                                        # A trick to swap stdout and stderr.
+# Again, you can pack this inside if, but it seems really long for some 80-col terminal users.
+exitstatus=$?
+if [ $exitstatus = 0 ]; then
+    echo "User selected " $CHOICE
+else
+    echo "User selected Cancel."
+fi
+
+echo "(Exit status was $exitstatus)"
+
+
+
+
+
