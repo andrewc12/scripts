@@ -99,8 +99,40 @@ EOF
 }
 installserver(){
 apt-get install isc-dhcp-server tftpd-hpa
+apt-get install syslinux
+apt-get install syslinux-common pxelinux
+do_copy_syslinux
 }
 
+
+do_copy_syslinux(){
+#In this section we set up a menu to load and boot files from the network
+#Files to boot
+mkdir $TFTPPATH/
+mkdir $TFTPPATH/images
+mkdir $TFTPPATH/pxelinux.cfg
+#Copy syslinux files
+#apt-get install syslinux
+#apt-get install syslinux-common pxelinux
+#wheezy
+cp $SYSLINUXPATH/pxelinux.0 $TFTPPATH/
+cp $SYSLINUXPATH/gpxelinux.0 $TFTPPATH/
+cp $SYSLINUXPATH/menu.c32 $TFTPPATH/
+cp $SYSLINUXPATH/vesamenu.c32 $TFTPPATH/
+cp $SYSLINUXPATH/reboot.c32 $TFTPPATH/
+cp $SYSLINUXPATH/chain.c32 $TFTPPATH/
+cp $SYSLINUXPATH/memdisk $TFTPPATH/
+#jessie
+cp /usr/lib/PXELINUX/pxelinux.0 $TFTPPATH/
+cp /usr/lib/PXELINUX/gpxelinux.0 $TFTPPATH/
+cp /usr/lib/syslinux/modules/bios/menu.c32 $TFTPPATH/
+cp /usr/lib/syslinux/modules/bios/vesamenu.c32 $TFTPPATH/
+cp /usr/lib/syslinux/modules/bios/reboot.c32 $TFTPPATH/
+cp /usr/lib/syslinux/modules/bios/chain.c32 $TFTPPATH/
+cp /usr/lib/syslinux/modules/bios/ldlinux.c32 $TFTPPATH/
+cp /usr/lib/syslinux/modules/bios/libutil.c32 $TFTPPATH/
+cp /usr/lib/syslinux/memdisk $TFTPPATH/
+)
 
 ####################MENU####################
 while true; do
@@ -171,32 +203,7 @@ host 4 { hardware ethernet $PXEMAC4; }
 EOF
 /etc/init.d/isc-dhcp-server restart
 
-#In this section we set up a menu to load and boot files from the network
-#Files to boot
-mkdir $TFTPPATH/
-mkdir $TFTPPATH/images
-mkdir $TFTPPATH/pxelinux.cfg
-#Copy syslinux files
-apt-get install syslinux
-apt-get install syslinux-common pxelinux
-#wheezy
-cp $SYSLINUXPATH/pxelinux.0 $TFTPPATH/
-cp $SYSLINUXPATH/gpxelinux.0 $TFTPPATH/
-cp $SYSLINUXPATH/menu.c32 $TFTPPATH/
-cp $SYSLINUXPATH/vesamenu.c32 $TFTPPATH/
-cp $SYSLINUXPATH/reboot.c32 $TFTPPATH/
-cp $SYSLINUXPATH/chain.c32 $TFTPPATH/
-cp $SYSLINUXPATH/memdisk $TFTPPATH/
-#jessie
-cp /usr/lib/PXELINUX/pxelinux.0 $TFTPPATH/
-cp /usr/lib/PXELINUX/gpxelinux.0 $TFTPPATH/
-cp /usr/lib/syslinux/modules/bios/menu.c32 $TFTPPATH/
-cp /usr/lib/syslinux/modules/bios/vesamenu.c32 $TFTPPATH/
-cp /usr/lib/syslinux/modules/bios/reboot.c32 $TFTPPATH/
-cp /usr/lib/syslinux/modules/bios/chain.c32 $TFTPPATH/
-cp /usr/lib/syslinux/modules/bios/ldlinux.c32 $TFTPPATH/
-cp /usr/lib/syslinux/modules/bios/libutil.c32 $TFTPPATH/
-cp /usr/lib/syslinux/memdisk $TFTPPATH/
+
 
 cat > $PXELINUXMENU << EOF
 ui menu.c32
