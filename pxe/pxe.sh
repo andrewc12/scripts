@@ -105,7 +105,7 @@ apt-get install isc-dhcp-server tftpd-hpa
 ####################MENU####################
 while true; do
 CHOICE=$(whiptail --title "PXE Setup Menu" --menu "Choose an option" $LINES $COLUMNS $(( $LINES - 8 )) \
-"<-- Back" "Return to the main menu." \
+"1 Install" "Install the required debian packages." \
 "Add User" "Add a user to the system." \
 "Modify User" "Modify an existing user." \
 "List Users" "List all users on the system." \
@@ -120,6 +120,10 @@ if [ $exitstatus = 1 ]; then
     exit 0
 elif [ $exitstatus = 0 ]; then
     echo "User selected " $CHOICE
+     case "$CHOICE" in
+      1\ *) installserver ;;
+      2\ *) installserver
+     esac
 else
 #    echo "User selected Cancel."
     exit 1
