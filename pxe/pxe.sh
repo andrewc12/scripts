@@ -150,31 +150,31 @@ tasksel tasksel/first multiselect standard, ssh-server
 
 
 
-
-
-
-
-d-i partman-auto/disk string /dev/sda
-d-i partman-auto/method string lvm
-
+### Partitioning
+d-i partman-auto/method string regular
 d-i partman-lvm/device_remove_lvm boolean true
 d-i partman-md/device_remove_md boolean true
 d-i partman-lvm/confirm boolean true
-d-i partman-lvm/confirm_nooverwrite boolean true
+#d-i partman-auto/choose_recipe select atomic
+#d-i partman/default_filesystem string btrfs
 
-d-i partman-auto-lvm/guided_size string max
+d-i partman-auto/expert_recipe string small-swap : \
+        16384 65536 -1 btrfs \
+            $primary{ } $bootable{ } \
+            method{ format } format{ } \
+            use_filesystem{ } filesystem{ btrfs } \
+            mountpoint{ / } . \
+        1024 4096 50% linux-swap \
+            method{ swap } format{ } .
 
-d-i partman-auto/choose_recipe select atomic
-
-
-
-d-i partman-md/confirm boolean true
+# This makes partman automatically partition without confirmation, provided
+# that you told it what to do using one of the methods above.
 d-i partman-partitioning/confirm_write_new_label boolean true
 d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 d-i partman/confirm_nooverwrite boolean true
 
-#d-i partman/mount_style select uuid
+
 
 
 
