@@ -6,6 +6,12 @@
 #                "${array[@]}", "$(command)". Use 'single quotes' to make something literal, eg. 'Costs $5 USD'. See
 #                <http://mywiki.wooledge.org/Quotes>, <http://mywiki.wooledge.org/Arguments> and
 #                <http://wiki.bash-hackers.org/syntax/words>.
+LIST="whiptail unzip wget tput"
+for ITEM in `echo $LIST`; do 
+command -v $ITEM >/dev/null 2>&1 || { echo >&2 "I require $ITEM but it's not installed.  Aborting."; exit 1; }
+done
+
+
 LINES=$(tput lines)
 COLUMNS=$(tput cols)
 
@@ -77,7 +83,7 @@ INSTALLDEBIANPRESEED=1
 installdebian(){
     mkdir /tmp/di${DEBARCH}
     cd /tmp/di${DEBARCH}
-    wget -c ftp://ftp.debian.org/debian/dists/wheezy/main/installer-${DEBARCH}/current/images/netboot/netboot.tar.gz
+    wget -c ftp://ftp.debian.org/debian/dists/jessie/main/installer-${DEBARCH}/current/images/netboot/netboot.tar.gz
     tar -xvf netboot.tar.gz
     mkdir -p $TFTPPATH/debian-installer/
     mv debian-installer/${DEBARCH} $TFTPPATH/debian-installer/.
@@ -94,6 +100,7 @@ EOF
 }
 
 installdebianpreseed(){
+#https://www.debian.org/releases/stable/amd64/apbs04.html.en
 cat > $TFTPPATH/debian-installer/preseed.cfg << EOF
 d-i debian-installer/language string en
 d-i debian-installer/country string US
@@ -118,8 +125,8 @@ d-i passwd/make-user boolean false
 d-i passwd/root-password password r00tme
 d-i passwd/root-password-again password r00tme
 
-tasksel tasksel/first multiselect standard
-d-i pkgsel/include string openssh-server
+tasksel tasksel/first multiselect standard, ssh-server
+#d-i pkgsel/include string openssh-server
 
 
 
