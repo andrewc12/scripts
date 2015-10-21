@@ -120,10 +120,6 @@ d-i mirror/http/directory string /debian/debian
 d-i mirror/suite string jessie
  
 
-d-i passwd/root-login boolean true
-d-i passwd/make-user boolean false
-d-i passwd/root-password password r00tme
-d-i passwd/root-password-again password r00tme
 
 tasksel tasksel/first multiselect standard, ssh-server
 #d-i pkgsel/include string openssh-server
@@ -174,6 +170,35 @@ d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 d-i partman/confirm_nooverwrite boolean true
 
+
+
+### Account setup
+# Skip creation of a root account (normal user account will be able to
+# use sudo).
+#d-i passwd/root-login boolean false
+# Alternatively, to skip creation of a normal user account.
+#d-i passwd/make-user boolean false
+
+# Root password, either in clear text
+d-i passwd/root-password password r00tme
+d-i passwd/root-password-again password r00tme
+# or encrypted using an MD5 hash.
+#d-i passwd/root-password-crypted password [MD5 hash]
+
+# To create a normal user account.
+d-i passwd/user-fullname string Andrew Innes
+d-i passwd/username string andrew
+# Normal user's password, either in clear text
+d-i passwd/user-password password insecure
+d-i passwd/user-password-again password insecure
+# or encrypted using an MD5 hash.
+#d-i passwd/user-password-crypted password [MD5 hash]
+# Create the first user with the specified UID instead of the default.
+#d-i passwd/user-uid string 1010
+
+# The user account will be added to some standard initial groups. To
+# override that, use this.
+#d-i passwd/user-default-groups string audio cdrom video
 
 
 
