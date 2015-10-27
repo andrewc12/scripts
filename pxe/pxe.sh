@@ -373,8 +373,8 @@ elif [ $exitstatus = 0 ]; then
       #Install/download software and Generate menus
       4\ *) do_select_install_payload
       #Install/download software and Generate menus
-     done
-     esac
+      esac
+      done
 else
 #    echo "User selected Cancel."
     exit 1
@@ -609,7 +609,6 @@ elif [ $exitstatus = 0 ]; then
       #Install/download software and Generate menus
       4\ *) do_select_install_payload
       #Install/download software and Generate menus
-     
      esac
 else
 #    echo "User selected Cancel."
