@@ -424,7 +424,9 @@ CHOICE=$(whiptail --title "Payload Selection Menu" --checklist "Choose an option
 "PAYLOAD_PLOP" "Install plop payload" ON \
 "PAYLOAD_CLONEZILLA" "Install clonezilla payload" ON \
 "PAYLOAD_DEBIAN_AMD64" "Install debian amd64 payload" ON \
-"PAYLOAD_DEBIAN_AMD64_PRESEED" "Install debian amd64 preseed payload" ON 3>&1 1>&2 2>&3)
+"PAYLOAD_DEBIAN_AMD64_PRESEED" "Install debian amd64 preseed payload" ON \
+"PAYLOAD_DEBIAN_I386" "Install debian i386 payload" OFF \
+"PAYLOAD_DEBIAN_I386_PRESEED" "Install debian i386 preseed payload" OFF 3>&1 1>&2 2>&3)
                                                                         # A trick to swap stdout and stderr.
 # Again, you can pack this inside if, but it seems really long for some 80-col terminal users.
 exitstatus=$?
@@ -443,11 +445,10 @@ EOF
      case "$I" in
       PAYLOAD_PLOP) do_install_plop ;;
       PAYLOAD_CLONEZILLA) do_install_clonezilla ;;
-      #Configure server
       PAYLOAD_DEBIAN_AMD64) do_install_debian_amd64 ;;
-      #Install/download software and Generate menus
-      PAYLOAD_DEBIAN_AMD64_PRESEED) do_select_install_debian_amd64_preseed
-      #Install/download software and Generate menus
+      PAYLOAD_DEBIAN_AMD64_PRESEED) do_select_install_debian_amd64_preseed ;;
+      PAYLOAD_DEBIAN_I386) do_install_debian_i386 ;;
+      PAYLOAD_DEBIAN_I386_PRESEED) do_select_install_debian_i386_preseed
       esac
       done
 else
