@@ -369,7 +369,7 @@ elif [ $exitstatus = 0 ]; then
       1\ *) installserver ;;
       2\ *) do_configure_server ;;
       #Configure server
-      3\ *) do_install_payload
+      3\ *) do_install_payload ;;
       #Install/download software and Generate menus
       4\ *) do_select_install_payload
       #Install/download software and Generate menus
@@ -605,7 +605,7 @@ elif [ $exitstatus = 0 ]; then
       1\ *) installserver ;;
       2\ *) do_configure_server ;;
       #Configure server
-      3\ *) do_install_payload
+      3\ *) do_install_payload ;;
       #Install/download software and Generate menus
       4\ *) do_select_install_payload
       #Install/download software and Generate menus
