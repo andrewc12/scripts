@@ -341,7 +341,24 @@ EOF
 
 
 
-
+do_install_clonezilla(){
+    #Extract the latest version
+    mkdir /tmp/clonezilla
+    cd /tmp
+    wget -c $CZPAEURL #http://downloads.sourceforge.net/project/clonezilla/clonezilla_live_stable/2.2.1-25/clonezilla-live-2.2.1-25-i686-pae.zip
+    cd /tmp/clonezilla
+    unzip ../${CZPAEURL##*/} #clonezilla-live-2.2.1-25-i686-pae.zip
+    cd ..
+    mv clonezilla $TFTPPATH/images/clonezilla
+    cat >> $PXELINUXMENU << EOF
+label clonezilla
+menu label Clonezilla
+  kernel images/clonezilla/live/vmlinuz
+  append boot=live username=user config  noswap edd=on nomodeset noprompt locales= keyboard-layouts= ocs_live_run="ocs-live-general" ocs_live_extra_param="" ocs_live_batch=no vga=788 nosplash fetch=tftp://$PXEIP/images/clonezilla/live/filesystem.squashfs i915.blacklist=yes radeonhd.blacklist=yes nouveau.blacklist=yes vmwgfx.enable_fbdev=no
+  initrd images/clonezilla/live/initrd.img
+EOF
+    echo "User installed clonezilla "
+}
 
 
 
@@ -351,7 +368,7 @@ do_select_install_payload(){
 
 
 
-CHOICE=$(whiptail --title "Payload Selection Menu" --checklist "Choose an option" $LINES $COLUMNS $(( $LINES - 8 )) \
+CHOICE=$(whiptail --title "Payload Selection Menu" --checklist "Choose an option" --separate-output $LINES $COLUMNS $(( $LINES - 8 )) \
 "PAYLOAD_PLOP" "Install plop payload" ON \
 "PAYLOAD_CLONEZILLA" "Install clonezilla payload" ON \
 "PAYLOAD_DEBIAN" "Install debian payload" ON \
@@ -366,9 +383,10 @@ elif [ $exitstatus = 0 ]; then
     echo "User selected " $CHOICE
     do_copy_syslinux    
      for I in $CHOICE; do
+         echo "User selected " $I
      case "$I" in
       PAYLOAD_PLOP) do_install_plop ;;
-      PAYLOAD_CLONEZILLA) do_install_clronezilla ;;
+      PAYLOAD_CLONEZILLA) do_install_clonezilla ;;
       #Configure server
       PAYLOAD_DEBIAN) do_install_debian ;;
       #Install/download software and Generate menus
@@ -393,24 +411,7 @@ menu title Utilities
 EOF
 
 ##############################################################################################################
-if [ "$INSTALLCLONEZILLA" -eq 1 ]
-then
-    #Extract the latest version
-    mkdir /tmp/clonezilla
-    cd /tmp
-    wget -c $CZPAEURL #http://downloads.sourceforge.net/project/clonezilla/clonezilla_live_stable/2.2.1-25/clonezilla-live-2.2.1-25-i686-pae.zip
-    cd /tmp/clonezilla
-    unzip ../${CZPAEURL##*/} #clonezilla-live-2.2.1-25-i686-pae.zip
-    cd ..
-    mv clonezilla $TFTPPATH/images/clonezilla
-    cat >> $PXELINUXMENU << EOF
-label clonezilla
-menu label Clonezilla
-  kernel images/clonezilla/live/vmlinuz
-  append boot=live username=user config  noswap edd=on nomodeset noprompt locales= keyboard-layouts= ocs_live_run="ocs-live-general" ocs_live_extra_param="" ocs_live_batch=no vga=788 nosplash fetch=tftp://$PXEIP/images/clonezilla/live/filesystem.squashfs i915.blacklist=yes radeonhd.blacklist=yes nouveau.blacklist=yes vmwgfx.enable_fbdev=no
-  initrd images/clonezilla/live/initrd.img
-EOF
-fi
+
 #################################################################################################################   
 if [ "$INSTALLPLOP" -eq 1 ]
 then
