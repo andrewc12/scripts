@@ -355,8 +355,7 @@ CHOICE=$(whiptail --title "Payload Selection Menu" --checklist "Choose an option
 "PAYLOAD_PLOP" "Install plop payload" ON \
 "PAYLOAD_CLONEZILLA" "Install clonezilla payload" ON \
 "PAYLOAD_DEBIAN" "Install debian payload" ON \
-"PAYLOAD_DEBIAN_PRESEED" "Install debian preseed payload" ON \
-"PAYLOAD_PLOP" "Install plop payload" ON 3>&1 1>&2 2>&3)
+"PAYLOAD_DEBIAN_PRESEED" "Install debian preseed payload" ON 3>&1 1>&2 2>&3)
                                                                         # A trick to swap stdout and stderr.
 # Again, you can pack this inside if, but it seems really long for some 80-col terminal users.
 exitstatus=$?
@@ -365,14 +364,15 @@ if [ $exitstatus = 1 ]; then
     exit 0
 elif [ $exitstatus = 0 ]; then
     echo "User selected " $CHOICE
+    do_copy_syslinux    
      for I in $CHOICE; do
      case "$I" in
-      1\ *) installserver ;;
-      2\ *) do_configure_server ;;
+      PAYLOAD_PLOP) do_install_plop ;;
+      PAYLOAD_CLONEZILLA) do_install_clronezilla ;;
       #Configure server
-      3\ *) do_install_payload ;;
+      PAYLOAD_DEBIAN) do_install_debian ;;
       #Install/download software and Generate menus
-      4\ *) do_select_install_payload
+      PAYLOAD_DEBIAN_PRESEED) do_select_install_debian_preseed
       #Install/download software and Generate menus
       esac
       done
@@ -385,7 +385,7 @@ echo "(Exit status was $exitstatus)"
 
 exit 0
 
-do_copy_syslinux
+
 
 cat > $PXELINUXMENU << EOF
 ui menu.c32
