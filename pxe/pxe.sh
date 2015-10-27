@@ -349,6 +349,41 @@ EOF
 
 do_select_install_payload(){
 
+
+
+CHOICE=$(whiptail --title "PXE Setup Menu" --checklist "Choose an option" $LINES $COLUMNS $(( $LINES - 8 )) \
+"NET_OUTBOUND" "Allow connections to other hosts" ON \
+"NET_INBOUND" "Allow connections from other hosts" OFF \
+"LOCAL_MOUNT" "Allow mounting of local devices" OFF \
+"REMOTE_MOUNT" "Allow mounting of remote devices" OFF 3>&1 1>&2 2>&3)
+                                                                        # A trick to swap stdout and stderr.
+# Again, you can pack this inside if, but it seems really long for some 80-col terminal users.
+exitstatus=$?
+if [ $exitstatus = 1 ]; then
+    echo "User selected Cancel."
+    exit 0
+elif [ $exitstatus = 0 ]; then
+    echo "User selected " $CHOICE
+     for I in $CHOICE; do
+     case "$I" in
+      1\ *) installserver ;;
+      2\ *) do_configure_server ;;
+      #Configure server
+      3\ *) do_install_payload
+      #Install/download software and Generate menus
+      4\ *) do_select_install_payload
+      #Install/download software and Generate menus
+     done
+     esac
+else
+#    echo "User selected Cancel."
+    exit 1
+fi
+
+echo "(Exit status was $exitstatus)"
+
+exit 0
+
 do_copy_syslinux
 
 cat > $PXELINUXMENU << EOF
@@ -672,3 +707,58 @@ echo "(Exit status was $exitstatus)"
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+CHOICE=$(whiptail --title "PXE Setup Menu" --checklist "Choose an option" $LINES $COLUMNS $(( $LINES - 8 )) \
+"NET_OUTBOUND" "Allow connections to other hosts" ON \
+"NET_INBOUND" "Allow connections from other hosts" OFF \
+"LOCAL_MOUNT" "Allow mounting of local devices" OFF \
+"REMOTE_MOUNT" "Allow mounting of remote devices" OFF 3>&1 1>&2 2>&3)
+                                                                        # A trick to swap stdout and stderr.
+# Again, you can pack this inside if, but it seems really long for some 80-col terminal users.
+exitstatus=$?
+if [ $exitstatus = 1 ]; then
+    echo "User selected Cancel."
+    exit 0
+elif [ $exitstatus = 0 ]; then
+    echo "User selected " $CHOICE
+     for I in $CHOICE; do
+     case "$I" in
+      1\ *) installserver ;;
+      2\ *) do_configure_server ;;
+      #Configure server
+      3\ *) do_install_payload
+      #Install/download software and Generate menus
+      4\ *) do_select_install_payload
+      #Install/download software and Generate menus
+     done
+     esac
+else
+#    echo "User selected Cancel."
+    exit 1
+fi
+
+echo "(Exit status was $exitstatus)"
+
+
+
+
+
+
+whiptail --title "Menu example" --menu "Choose an option" 20 78 16 \
+"<-- Back" "Return to the main menu." \
+"Add User" "Add a user to the system." \
+"Modify User" "Modify an existing user." \
+"List Users" "List all users on the system." \
+"Add Group" "Add a user group to the system." \
+"Modify Group" "Modify a group and its list of members." \
+"List Groups" "List all groups on the system."
