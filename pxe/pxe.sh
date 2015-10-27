@@ -351,11 +351,12 @@ do_select_install_payload(){
 
 
 
-CHOICE=$(whiptail --title "PXE Setup Menu" --checklist "Choose an option" $LINES $COLUMNS $(( $LINES - 8 )) \
-"NET_OUTBOUND" "Allow connections to other hosts" ON \
-"NET_INBOUND" "Allow connections from other hosts" OFF \
-"LOCAL_MOUNT" "Allow mounting of local devices" OFF \
-"REMOTE_MOUNT" "Allow mounting of remote devices" OFF 3>&1 1>&2 2>&3)
+CHOICE=$(whiptail --title "Payload Selection Menu" --checklist "Choose an option" $LINES $COLUMNS $(( $LINES - 8 )) \
+"PAYLOAD_PLOP" "Install plop payload" ON \
+"PAYLOAD_CLONEZILLA" "Install clonezilla payload" ON \
+"PAYLOAD_DEBIAN" "Install debian payload" ON \
+"PAYLOAD_DEBIAN_PRESEED" "Install debian preseed payload" ON \
+"PAYLOAD_PLOP" "Install plop payload" ON 3>&1 1>&2 2>&3)
                                                                         # A trick to swap stdout and stderr.
 # Again, you can pack this inside if, but it seems really long for some 80-col terminal users.
 exitstatus=$?
