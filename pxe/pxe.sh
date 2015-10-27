@@ -361,60 +361,7 @@ EOF
 }
 
 
-
-
-
-do_select_install_payload(){
-
-
-
-CHOICE=$(whiptail --title "Payload Selection Menu" --checklist "Choose an option" --separate-output $LINES $COLUMNS $(( $LINES - 8 )) \
-"PAYLOAD_PLOP" "Install plop payload" ON \
-"PAYLOAD_CLONEZILLA" "Install clonezilla payload" ON \
-"PAYLOAD_DEBIAN" "Install debian payload" ON \
-"PAYLOAD_DEBIAN_PRESEED" "Install debian preseed payload" ON 3>&1 1>&2 2>&3)
-                                                                        # A trick to swap stdout and stderr.
-# Again, you can pack this inside if, but it seems really long for some 80-col terminal users.
-exitstatus=$?
-if [ $exitstatus = 1 ]; then
-    echo "User selected Cancel."
-    exit 0
-elif [ $exitstatus = 0 ]; then
-    echo "User selected " $CHOICE
-    do_copy_syslinux    
-     for I in $CHOICE; do
-         echo "User selected " $I
-     case "$I" in
-      PAYLOAD_PLOP) do_install_plop ;;
-      PAYLOAD_CLONEZILLA) do_install_clonezilla ;;
-      #Configure server
-      PAYLOAD_DEBIAN) do_install_debian ;;
-      #Install/download software and Generate menus
-      PAYLOAD_DEBIAN_PRESEED) do_select_install_debian_preseed
-      #Install/download software and Generate menus
-      esac
-      done
-else
-#    echo "User selected Cancel."
-    exit 1
-fi
-
-echo "(Exit status was $exitstatus)"
-
-exit 0
-
-
-
-cat > $PXELINUXMENU << EOF
-ui menu.c32
-menu title Utilities
-EOF
-
-##############################################################################################################
-
-#################################################################################################################   
-if [ "$INSTALLPLOP" -eq 1 ]
-then
+do_install_plop(){
     cd /tmp
     wget -c  http://download.plop.at/files/bootmngr/plpbt-5.0.15-test.zip
     unzip plpbt-5.0.15-test.zip
@@ -440,28 +387,87 @@ Run Plop Install
 ENDTEXT
 MENU END
 EOF
+}
 
-fi
-##############################################################################################################
-if [ "$INSTALLDEBIANAMD64" -eq 1 ]
-then
+
+
+do_install_debian_amd64(){
     export DEBARCH="amd64"
     installdebian
     if [ "$INSTALLDEBIANPRESEED" -eq 1 ]
     then
         installdebianpreseed
     fi
-fi
+}
 ##############################################################################################################
-if [ "$INSTALLDEBIANI386" -eq 1 ]
-then
+do_install_debian_i386(){
     export DEBARCH="i386"
     installdebian
     if [ "$INSTALLDEBIANPRESEED" -eq 1 ]
     then
         installdebianpreseed
     fi
+}
+
+
+
+
+
+
+
+
+do_select_install_payload(){
+
+
+
+CHOICE=$(whiptail --title "Payload Selection Menu" --checklist "Choose an option" --separate-output $LINES $COLUMNS $(( $LINES - 8 )) \
+"PAYLOAD_PLOP" "Install plop payload" ON \
+"PAYLOAD_CLONEZILLA" "Install clonezilla payload" ON \
+"PAYLOAD_DEBIAN_AMD64" "Install debian amd64 payload" ON \
+"PAYLOAD_DEBIAN_AMD64_PRESEED" "Install debian amd64 preseed payload" ON 3>&1 1>&2 2>&3)
+                                                                        # A trick to swap stdout and stderr.
+# Again, you can pack this inside if, but it seems really long for some 80-col terminal users.
+exitstatus=$?
+if [ $exitstatus = 1 ]; then
+    echo "User selected Cancel."
+    exit 0
+elif [ $exitstatus = 0 ]; then
+    echo "User selected " $CHOICE
+    do_copy_syslinux    
+    cat > $PXELINUXMENU << EOF
+ui menu.c32
+menu title Utilities
+EOF
+     for I in $CHOICE; do
+         echo "User selected " $I
+     case "$I" in
+      PAYLOAD_PLOP) do_install_plop ;;
+      PAYLOAD_CLONEZILLA) do_install_clonezilla ;;
+      #Configure server
+      PAYLOAD_DEBIAN_AMD64) do_install_debian_amd64 ;;
+      #Install/download software and Generate menus
+      PAYLOAD_DEBIAN_AMD64_PRESEED) do_select_install_debian_amd64_preseed
+      #Install/download software and Generate menus
+      esac
+      done
+else
+#    echo "User selected Cancel."
+    exit 1
 fi
+
+echo "(Exit status was $exitstatus)"
+
+exit 0
+
+
+
+
+
+##############################################################################################################
+
+
+##############################################################################################################
+
 ##############################################################################################################
 sleep 10
 }
