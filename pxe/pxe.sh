@@ -321,9 +321,7 @@ subnet $DHCPSUBNET netmask $DHCPNETMASK {
 if exists user-class and option user-class = "gPXE" {
     filename "pxelinux.0";
 } else {
-    if substring(option vendor-class-identifier, 0, 9) = "PXEClient" {
-        filename "gpxelinux.0";
-    }
+    filename "gpxelinux.0";
 }
 #Find out if this works 
 #if substring(option vendor-class-identifier, 0, 9) = "PXEClient" {filename "gpxelinux.0";}
