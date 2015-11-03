@@ -300,6 +300,8 @@ cp /usr/lib/syslinux/modules/bios/chain.c32 $TFTPPATH/
 cp /usr/lib/syslinux/modules/bios/ldlinux.c32 $TFTPPATH/
 cp /usr/lib/syslinux/modules/bios/libutil.c32 $TFTPPATH/
 cp /usr/lib/syslinux/memdisk $TFTPPATH/
+#TODO add this to wheezy
+cp /usr/lib/syslinux/modules/bios/libcom32.c32 $TFTPPATH/
 }
 
 do_configure_server(){
@@ -436,6 +438,11 @@ elif [ $exitstatus = 0 ]; then
     cat > $PXELINUXMENU << EOF
 ui menu.c32
 menu title Utilities
+
+LABEL boot_hd0
+MENU LABEL Boot from first hard drive
+COM32 chain.c32
+APPEND hd0
 EOF
      for I in $CHOICE; do
          echo "User selected " $I
