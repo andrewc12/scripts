@@ -512,87 +512,6 @@ sleep 10
 
 
 
-do_install_payload(){
-
-do_copy_syslinux
-
-cat > $PXELINUXMENU << EOF
-ui menu.c32
-menu title Utilities
-EOF
-
-##############################################################################################################
-if [ "$INSTALLCLONEZILLA" -eq 1 ]
-then
-    #Extract the latest version
-    mkdir /tmp/clonezilla
-    cd /tmp
-    wget -c $CZPAEURL #http://downloads.sourceforge.net/project/clonezilla/clonezilla_live_stable/2.2.1-25/clonezilla-live-2.2.1-25-i686-pae.zip
-    cd /tmp/clonezilla
-    unzip ../${CZPAEURL##*/} #clonezilla-live-2.2.1-25-i686-pae.zip
-    cd ..
-    mv clonezilla $TFTPPATH/images/clonezilla
-    cat >> $PXELINUXMENU << EOF
-label clonezilla
-menu label Clonezilla
-  kernel images/clonezilla/live/vmlinuz
-  append boot=live username=user config  noswap edd=on nomodeset noprompt locales= keyboard-layouts= ocs_live_run="ocs-live-general" ocs_live_extra_param="" ocs_live_batch=no vga=788 nosplash fetch=tftp://$PXEIP/images/clonezilla/live/filesystem.squashfs i915.blacklist=yes radeonhd.blacklist=yes nouveau.blacklist=yes vmwgfx.enable_fbdev=no
-  initrd images/clonezilla/live/initrd.img
-EOF
-fi
-#################################################################################################################   
-if [ "$INSTALLPLOP" -eq 1 ]
-then
-    cd /tmp
-    wget -c  http://download.plop.at/files/bootmngr/plpbt-5.0.15-test.zip
-    unzip plpbt-5.0.15-test.zip
-    mv plpbt-5.0.15-test $TFTPPATH/images/plop
-    cat >> $PXELINUXMENU << EOF
-MENU BEGIN Plop
-MENU LABEL Plop
-MENU TITLE Plop boot loader
-LABEL Back
-MENU EXIT
-MENU LABEL Back
-LABEL Plop Live
-kernel images/plop/plpbt.bin
-MENU LABEL Plop
-TEXT HELP
-Run Plop
-ENDTEXT
-LABEL Plop Install
-kernel images/plop/install/plpinstc.com
-MENU LABEL Install Plop
-TEXT HELP
-Run Plop Install
-ENDTEXT
-MENU END
-EOF
-
-fi
-##############################################################################################################
-if [ "$INSTALLDEBIANAMD64" -eq 1 ]
-then
-    export DEBARCH="amd64"
-    installdebian
-    if [ "$INSTALLDEBIANPRESEED" -eq 1 ]
-    then
-        installdebianpreseed
-    fi
-fi
-##############################################################################################################
-if [ "$INSTALLDEBIANI386" -eq 1 ]
-then
-    export DEBARCH="i386"
-    installdebian
-    if [ "$INSTALLDEBIANPRESEED" -eq 1 ]
-    then
-        installdebianpreseed
-    fi
-fi
-##############################################################################################################
-sleep 10
-}
 
 
 ####################MENU####################
@@ -600,8 +519,7 @@ while true; do
 CHOICE=$(whiptail --title "PXE Setup Menu" --menu "Choose an option" $LINES $COLUMNS $(( $LINES - 8 )) \
 "1 Install" "Install the required debian packages." \
 "2 Configure" "Configure the services." \
-"3 Payloads" "Download and install the network payloads." \
-"4 Payloads" "Select download and install the network payloads." \
+"3 Payloads" "Select download and install the network payloads." \
 "Add Group" "Add a user group to the system." \
 "Modify Group" "Modify a group and its list of members." \
 "List Groups" "List all groups on the system." 3>&1 1>&2 2>&3)
@@ -616,10 +534,8 @@ elif [ $exitstatus = 0 ]; then
      case "$CHOICE" in
       1\ *) installserver ;;
       2\ *) do_configure_server ;;
-      #Configure server
-      3\ *) do_install_payload ;;
       #Install/download software and Generate menus
-      4\ *) do_select_install_payload
+      3\ *) do_select_install_payload
       #Install/download software and Generate menus
      esac
 else
