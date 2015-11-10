@@ -7,6 +7,6 @@ chmod 0600 /root/.ssh/authorized_keys
 chown -R root:root /root/.ssh
 adduser --disabled-password --gecos "" ansible
 su -c "mkdir -pm 700 ~/.ssh" ansible
-su -c "echo 'ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAIEAhP5VvOuGObKch4q8H8CTIbZswuaaysvHxjZ0JBI2AIfbpPbGIPlKE5jKtNxoSITQdR6PNXu8UgoAdL1828QwcDCwsfjNg0G1Wv2+i/b6Kpd8M3DN9HyKk5C+2nXzfNw2ow5YfuN5GlbNEB7C6WYrQQsATqILB+45oDuZhjV43GE= postinstall key' > ~/.ssh/authorized_keys" ansible
+su -c "echo 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDJE8h3gXqvtlNRIljS4IshJviaFPQjP/LlnQE0SQDAMxVvWwBWQqivGcVwygdyf82ivxTmzhN3pISR9rudGsiiwKTaj4dRwVBQcTu3YS2jaV4PQ/pbb1Hi8++zMz9UmFAXqd1L3DFnenW8OtlKf94Kg97QFikO10VtgUs3beQNUu9+WhXsNXGk5ngTUszA/rr4uSmq3jgNEHdwfgvW3bDRXM4CNE2yN4jYwuPhkRWrOh63QDU3jSFtrKyzGA/O979NJ9hpzR84w/rsOFz6aX9h+XIgHcqk2/ir0L5++/WerkBi0Q20B7ckRhqpKsrYaaNzIQPRkcrI98lDLNu7YDF3 ansible@ansible' > ~/.ssh/authorized_keys" ansible
 su -c "chmod 0600 ~/.ssh/authorized_keys" ansible
 su -c "chown -R ansible:ansible ~/.ssh" ansible
