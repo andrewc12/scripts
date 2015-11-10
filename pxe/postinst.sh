@@ -10,3 +10,6 @@ su -c "mkdir -pm 700 ~/.ssh" ansible
 su -c "echo 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDJE8h3gXqvtlNRIljS4IshJviaFPQjP/LlnQE0SQDAMxVvWwBWQqivGcVwygdyf82ivxTmzhN3pISR9rudGsiiwKTaj4dRwVBQcTu3YS2jaV4PQ/pbb1Hi8++zMz9UmFAXqd1L3DFnenW8OtlKf94Kg97QFikO10VtgUs3beQNUu9+WhXsNXGk5ngTUszA/rr4uSmq3jgNEHdwfgvW3bDRXM4CNE2yN4jYwuPhkRWrOh63QDU3jSFtrKyzGA/O979NJ9hpzR84w/rsOFz6aX9h+XIgHcqk2/ir0L5++/WerkBi0Q20B7ckRhqpKsrYaaNzIQPRkcrI98lDLNu7YDF3 ansible@ansible' > ~/.ssh/authorized_keys" ansible
 su -c "chmod 0600 ~/.ssh/authorized_keys" ansible
 su -c "chown -R ansible:ansible ~/.ssh" ansible
+adduser ansible sudo
+#visudo ansible ALL=(ALL) NOPASSWD:ALL
+echo "ansible ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
