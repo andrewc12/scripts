@@ -307,33 +307,35 @@ cp /usr/lib/syslinux/modules/bios/libcom32.c32 $TFTPPATH/
 
 do_configure_server(){
 cat > $DHCPDCONF << EOF
+ddns-update-style none;
+option domain-name-servers $DHCPDNS;
 
 default-lease-time 600;
 max-lease-time 7200;
 allow booting;
-#ignore unknown-clients;
-subnet $DHCPSUBNET netmask $DHCPNETMASK {
-    range $DHCPLEASESTART $DHCPLEASESTOP;
-    option broadcast-address $DHCPBROADCAST;
-    option routers $DHCPROUTER;
-    option domain-name-servers $DHCPDNS;
-    next-server $PXEIP;
-}
+log-facility local7;
 
-#chainloading
-if exists user-class and option user-class = "gPXE" {
+class "pxeclients" {
+ match if substring(option vendor-class-identifier, 0, 9) = "PXEClient";
+ if exists user-class and option user-class = "gPXE" {
     filename "pxelinux.0";
-} else {
+ } else {
     filename "gpxelinux.0";
+ }
 }
-#Find out if this works 
-#if substring(option vendor-class-identifier, 0, 9) = "PXEClient" {filename "gpxelinux.0";}
-#if exists user-class and option user-class = "gPXE" {filename "pxelinux.0";}
-host 1 { hardware ethernet $PXEMAC1; }
-host 2 { hardware ethernet $PXEMAC2; }
-host 3 { hardware ethernet $PXEMAC3; }
-host 4 { hardware ethernet $PXEMAC4; }
 
+shared-network 5 {
+ subnet $DHCPSUBNET netmask $DHCPNETMASK {
+ }
+ pool {
+  allow members of "pxeclients";
+  range $DHCPLEASESTART $DHCPLEASESTOP;
+  option broadcast-address $DHCPBROADCAST;
+  option routers $DHCPROUTER;
+  option domain-name-servers $DHCPDNS;
+  next-server $PXEIP;
+ }
+}
 EOF
 /etc/init.d/isc-dhcp-server restart
 }
