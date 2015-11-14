@@ -24,15 +24,15 @@
 while getopts "B:n:r:" opt; do
   case $opt in
     B)
-      echo "-a was triggered, Parameter: $OPTARG" >&2
+      echo "-B was triggered, Parameter: $OPTARG" >&2
       BSTORE=$OPTARG
       ;;
     n)
-      echo "-a was triggered, Parameter: $OPTARG" >&2
+      echo "-n was triggered, Parameter: $OPTARG" >&2
       container=$OPTARG
       ;;
     r)
-      echo "-a was triggered, Parameter: $OPTARG" >&2
+      echo "-r was triggered, Parameter: $OPTARG" >&2
       RELEASE=$OPTARG
       ;;
     \?)
@@ -82,12 +82,16 @@ sleep 20
 #chroot /var/lib/lxc/$container/rootfs/
 lxc-attach -n $container -- apt-get update
 #chroot /var/lib/lxc/$container/rootfs/ 
-lxc-attach -n $container -- apt-get install openssh-server -y
+lxc-attach -n $container -- apt-get install openssh-server wget -y
 #chroot /var/lib/lxc/$container/rootfs/ 
 lxc-attach -n $container -- passwd
 #chroot /var/lib/lxc/$container/rootfs/ 
 lxc-attach -n $container -- adduser andrew
 #chroot /var/lib/lxc/$container/rootfs/ passwd andrew
+lxc-attach -n $container -- wget https://raw.githubusercontent.com/andrewc12/scripts/master/pxe/postinst.sh -O /tmp/postinst.sh
+lxc-attach -n $container -- /bin/chmod 755 /tmp/postinst.sh
+lxc-attach -n $container -- /tmp/postinst.sh
+
 lxc-stop -n $container
 
 
