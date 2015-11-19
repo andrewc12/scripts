@@ -3,10 +3,6 @@ CONTAINER=transmission
 #Create container
 ../mkdebianmenu.sh -B none -n $CONTAINER -r jessie 
 #In fstab
-cat >> /var/lib/lxc/$CONTAINER/fstab << EOF
-/storage storage none bind,create=dir
-/storage/transmission-daemon var/lib/transmission-daemon none bind,create=dir
-EOF
 
 
 lxc-start -n $CONTAINER -d
@@ -51,4 +47,14 @@ OPTIONS="--config-dir $CONFIG_DIR"
 #START_STOP_OPTIONS="--iosched idle --nicelevel 10"
 EOF
 lxc-stop -n $CONTAINER
+
+#If you do this before you install transmission it over writes the settings file
+cat >> /var/lib/lxc/$CONTAINER/fstab << EOF
+/storage storage none bind,create=dir
+/storage/transmission-daemon var/lib/transmission-daemon none bind,create=dir
+/storage/transmission-daemon/info var/lib/transmission-daemon/.config/transmission-daemon/ none bind,create=dir
+EOF
+
+
+
 exit 0

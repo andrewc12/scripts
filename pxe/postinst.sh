@@ -14,3 +14,6 @@ su -c "chown -R andrew:andrew ~/.ssh" andrew
 adduser andrew sudo
 #visudo ansible ALL=(ALL) NOPASSWD:ALL
 echo "andrew ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+#Nice convenient apps that I want installed
+apt-get install nano -y
