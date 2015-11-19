@@ -11,7 +11,7 @@ lxc-start -n $CONTAINER -d
 sleep 20
 lxc-attach -n $CONTAINER -- apt-get install git build-essential apt-build fakeroot -y
 
-cat > /var/lib/lxc/$CONTAINER/rootfs/hone/andrew/.gitconfig << EOF
+cat > /var/lib/lxc/$CONTAINER/rootfs/home/andrew/.gitconfig << EOF
 [user]
         name = Andrew Innes
         email = andrew.c12@gmail.com
