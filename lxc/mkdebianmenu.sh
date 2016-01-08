@@ -71,9 +71,9 @@ lxc.network.name = eth0
 #lxc.start.delay = 0
 EOF
 
-macaddr=$(echo $container|md5sum|sed 's/^\(..\)\(..\)\(..\)\(..\)\(..\).*$/02:\1:\2:\3:\4:\5/')
-echo "lxc.network.hwaddr = $macaddr" >> /var/lib/lxc/$container/config
-echo "lxc.network.hwaddr = $macaddr"
+#macaddr=$(echo $container|md5sum|sed 's/^\(..\)\(..\)\(..\)\(..\)\(..\).*$/02:\1:\2:\3:\4:\5/')
+#echo "lxc.network.hwaddr = $macaddr" >> /var/lib/lxc/$container/config
+#echo "lxc.network.hwaddr = $macaddr"
 
 lxc-start -n $container -d
 #chroot /var/lib/lxc/$container/rootfs/ bin/bash

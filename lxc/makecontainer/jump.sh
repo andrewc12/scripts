@@ -1,7 +1,7 @@
 #!/bin/sh
 CONTAINER=jump
 #Create container
-../mkdebianmenu.sh -B none -n $CONTAINER -r jessie 
+../mkdebianmenu.sh -B none -n $CONTAINER -r jessie
 #In fstab
 
 
