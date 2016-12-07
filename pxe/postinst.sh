@@ -15,5 +15,8 @@ adduser andrew sudo
 #visudo ansible ALL=(ALL) NOPASSWD:ALL
 echo "andrew ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
+passwd -l root
+passwd -l andrew
+
 #Nice convenient apps that I want installed
 apt-get install nano -y
